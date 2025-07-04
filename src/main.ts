@@ -28,7 +28,11 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 
+
 app.use(GlobalComponents); // 全局注册vue组件
+
+
+
 
 app.mount('#app');
 

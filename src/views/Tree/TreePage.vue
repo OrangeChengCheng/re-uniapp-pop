@@ -1,3 +1,8 @@
+<!--
+ * @Author: Lemon C
+ * @Date: 2025-07-03 11:42:15
+ * @LastEditTime: 2025-07-04 12:54:45
+-->
 <template>
     <base-view>
         <div class="container">
@@ -18,12 +23,19 @@
 
 // MOD-- JavaScript
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import BaseView from '@/components/Base/BaseView.vue';
 
 const initAppToWebMsg = ref('');
 const mobileMessage = ref('');
 const modelVisible = ref(true);
+
+const NativeBridge = (window as any).$reapi;
+
+onMounted(() => {
+    NativeBridge.registerAppMsg(handleMobileMessage);
+    NativeBridge.getInitUrlParam();
+});
 
 // 处理从 移动端 接收的消息
 const handleMobileMessage = (message: any) => {
@@ -55,83 +67,56 @@ const sendMessageToMobile = () => {
             },
         },
     };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.reSendMessageToApp(sendData);
     console.log('已发送消息到 移动端:', JSON.stringify(sendData));
 };
 const sendMessageToMobileCloose = () => {
-    let sendData = {
-        type: 'cloose',
-        data: {},
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.cloose();
 };
 const click_setModelAlpha = () => {
-    let sendData = {
-        type: 'setModelAlpha',
-        data: {
-            alpha: 128,
-            dataSetId: 'res_hushizhan',
-            elemIdList: [22],
-        },
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.setModelAlpha({
+        alpha: 128,
+        dataSetId: 'res_hushizhan',
+        elemIdList: [22],
+    });
 };
 const click_setModelVisible = () => {
     modelVisible.value = !modelVisible.value;
-    let sendData = {
-        type: 'setModelVisible',
-        data: {
-            visible: modelVisible.value,
-            dataSetId: 'res_hushizhan',
-            elemIdList: [22],
-        },
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.setModelVisible({
+        visible: modelVisible.value,
+        dataSetId: 'res_hushizhan',
+        elemIdList: [22],
+    });
 };
 const click_locDataSet = () => {
-    let sendData = {
-        type: 'locDataSet',
-        data: {
-            dataSetId: 'res_hushizhan',
-            backDepth: 1.0,
-        },
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.locDataSet({
+        dataSetId: 'res_hushizhan',
+        backDepth: 1.0,
+    });
 };
 const click_setLoc = () => {
-    let sendData = {
-        type: 'setCamLocTo',
-        data: {
-            camPos: [12654914.48635184, 4130009.3671415593, 17.31782443427872],
-            camRotate: [0.36157101126036134, -0.1404893305387332, -0.3338153488477842, 0.8591254068496466],
-            camDir: [0.4827918130284945, 0.5274746945418344, -0.6990583036418765],
-            locDelay: 0,
-            locTime: 0,
-        },
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.setCamLocTo({
+        camPos: [12654914.48635184, 4130009.3671415593, 17.31782443427872],
+        camRotate: [0.36157101126036134, -0.1404893305387332, -0.3338153488477842, 0.8591254068496466],
+        camDir: [0.4827918130284945, 0.5274746945418344, -0.6990583036418765],
+        locDelay: 0,
+        locTime: 0,
+    });
 };
 const click_getLoc = () => {
-    let sendData = {
-        type: 'getCamLocInfo',
-        data: {},
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    const camLoc = NativeBridge.getCamLocInfo();
+    console.log(`camLoc: ${JSON.stringify(camLoc)}`);
 };
 const click_locElem = () => {
-    let sendData = {
-        type: 'locElem',
-        data: {
-            locIDList: [
-                {
-                    dataSetId: 'res_hushizhan',
-                    elemIdList: [22],
-                },
-            ],
-            backDepth: 1.0,
-        },
-    };
-    // NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.locElem({
+        locIDList: [
+            {
+                dataSetId: 'res_hushizhan',
+                elemIdList: [22],
+            },
+        ],
+        backDepth: 1.0,
+    });
 };
 </script>
 
