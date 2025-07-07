@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-07-04 10:36:22
+ * @LastEditTime: 2025-07-04 16:34:15
  */
 import config from './config'
 import reApi from './reApi'
@@ -11,12 +11,15 @@ import tool from './tool'
 
 export default {
     install(app: any) {
-        app.config.globalProperties.$service = {
+        (window as any).$service = {
             serverUrl: config.getServerUrl(),
+            token: config.getToken(),
             downloadUrl: config.getDownloadUrl(),
             commonTimeout: config.getTimeout(),
             update_serverUrl: config.updateServerUrl,
             get_serverUrl: config.getServerUrl,
+            update_token: config.updateToken,
+            get_token: config.getToken,
         };
 
         (window as any).$reapi = {

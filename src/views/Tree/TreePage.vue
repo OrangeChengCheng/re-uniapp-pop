@@ -1,11 +1,11 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-07-04 12:54:45
+ * @LastEditTime: 2025-07-04 17:03:17
 -->
 <template>
     <base-view>
-        <div class="container">
+        <div class="tree-container">
             <button @click="sendMessageToMobileCloose()">关闭【目录树弹窗】</button>
             <div>Web 与 移动端 通信示例</div>
             <div class="message"><strong>接收【初始化消息】:</strong> {{ initAppToWebMsg }}</div>
@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import BaseView from '@/components/Base/BaseView.vue';
+import { getSharedExtrudeTexturesList } from '@/service/interface';
 
 const initAppToWebMsg = ref('');
 const mobileMessage = ref('');
@@ -35,6 +36,13 @@ const NativeBridge = (window as any).$reapi;
 onMounted(() => {
     NativeBridge.registerAppMsg(handleMobileMessage);
     NativeBridge.getInitUrlParam();
+    getSharedExtrudeTexturesList()
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 // 处理从 移动端 接收的消息
@@ -122,10 +130,10 @@ const click_locElem = () => {
 
 // MOD-- CSS
 <style lang="scss" scoped>
-.container {
+.tree-container {
     position: relative;
     width: 100%;
-    height: 380px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;

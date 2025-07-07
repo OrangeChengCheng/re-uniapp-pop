@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-04-19 12:22:21
- * @LastEditTime: 2025-06-03 12:36:20
+ * @LastEditTime: 2025-07-04 16:29:25
  */
 
 
@@ -10,7 +10,9 @@ const RE_DownloadUrl = "/DownloadService/blackHole3D/files/Download";
 
 interface ApiMethods {
     getServerUrl(): string;
+    getToken(): string;
     updateServerUrl(url: string): void;
+    updateToken(token: string): void;
     getDownloadUrl(): string;
     getTimeout(): number;
 }
@@ -19,28 +21,43 @@ interface ApiMethods {
 const api: ApiMethods = {
     // MARK config 获取当前的服务配置地址
     getServerUrl: (): string => {
-        // let private_serverUrl = uni.getStorageSync('RE_private_serverUrl');
-        // if (!private_serverUrl || private_serverUrl.length <= 0) {
+        let private_serverUrl = sessionStorage.getItem('RE_private_serverUrl');
+        if (!private_serverUrl || private_serverUrl.length <= 0) {
             return RE_ServerURl;
-        // } else {
-        //     return private_serverUrl;
-        // }
+        } else {
+            return private_serverUrl;
+        }
+    },
+
+    // MARK config 获取当前的Token
+    getToken: (): string => {
+        let token = sessionStorage.getItem('RE_Token');
+        if (!token || token.length <= 0) {
+            return "";
+        } else {
+            return token;
+        }
     },
 
     // MARK config 获取当前的服务资源地址
     getDownloadUrl: (): string => {
-        // let private_serverUrl = uni.getStorageSync('RE_private_serverUrl');
-        // if (!private_serverUrl || private_serverUrl.length <= 0) {
+        let private_serverUrl = sessionStorage.getItem('RE_private_serverUrl');
+        if (!private_serverUrl || private_serverUrl.length <= 0) {
             return `${RE_ServerURl}${RE_DownloadUrl}`;
-        // } else {
-        //     return `${private_serverUrl}${RE_DownloadUrl}`;
-        // }
+        } else {
+            return `${private_serverUrl}${RE_DownloadUrl}`;
+        }
     },
 
 
     // MARK config 更新服务配置地址
     updateServerUrl: (url: string): void => {
-        // uni.setStorageSync('RE_private_serverUrl', url);
+        sessionStorage.setItem('RE_private_serverUrl', url);
+    },
+
+    // MARK config 更新Token
+    updateToken: (token: string): void => {
+        sessionStorage.setItem('RE_Token', token);
     },
 
 

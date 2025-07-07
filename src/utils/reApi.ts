@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-03 17:31:16
+ * @LastEditTime: 2025-07-07 14:31:51
  */
 
 
@@ -96,6 +96,13 @@ const api: ApiMethods = {
         params.forEach((value, key) => {
             result[key] = value;
         });
+        //更新服务配置
+        if (result.baseUrl && result.baseUrl.length > 0) {
+            (window as any).$service.update_serverUrl(result.baseUrl);
+        }
+        if (result.token && result.token.length > 0) {
+            (window as any).$service.update_token(result.token);
+        }
         console.log('接收到的参数:', JSON.stringify(result));
         return result;
     },
