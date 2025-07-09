@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-07 14:58:27
- * @LastEditTime: 2025-07-07 15:07:03
+ * @LastEditTime: 2025-07-09 15:47:58
 -->
 <template>
     <base-view>
@@ -96,7 +96,7 @@ const clearModelSel = () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    // background-color: red;
+    background-color: red;
     overflow: auto;
     // padding-bottom: 50px;
 

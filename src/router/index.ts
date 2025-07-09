@@ -7,6 +7,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router' // 单独导入类型
 import TreePage from '@/views/Tree/TreePage.vue'
 import PropertyPage from '@/views/Property/PropertyPage.vue'
+import CADPage from '@/views/CAD/CADPage.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -18,6 +19,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/property',
         name: 'property',
         component: PropertyPage
+    },
+    {
+        path: '/cad',
+        name: 'cad',
+        component: CADPage
     },
 ]
 

@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-02 11:25:16
- * @LastEditTime: 2025-07-07 15:11:21
+ * @LastEditTime: 2025-07-09 16:30:03
 -->
 <template>
     <router-view />
@@ -37,6 +37,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     width: 100vw;
     height: 100vh;
+    background: green;
 }
 :root {
     --color-white: #ffffff;
