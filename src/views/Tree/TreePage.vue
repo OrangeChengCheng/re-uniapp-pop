@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-07-04 17:03:17
+ * @LastEditTime: 2025-07-15 15:24:38
 -->
 <template>
     <base-view>
@@ -35,7 +35,7 @@ const NativeBridge = (window as any).$reapi;
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handleMobileMessage);
-    NativeBridge.getInitUrlParam();
+    // NativeBridge.getInitUrlParam();
     getSharedExtrudeTexturesList()
         .then((res) => {
             console.log(res);
@@ -75,7 +75,7 @@ const sendMessageToMobile = () => {
             },
         },
     };
-    NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.sendMsgWebToApp(sendData);
     console.log('已发送消息到 移动端:', JSON.stringify(sendData));
 };
 const sendMessageToMobileCloose = () => {

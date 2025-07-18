@@ -1,13 +1,12 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-07-04 16:34:15
+ * @LastEditTime: 2025-07-18 09:56:39
  */
 import config from './config'
 import reApi from './reApi'
 import tool from './tool'
-
-
+import { showLoading, hideLoading } from './loading'
 
 export default {
     install(app: any) {
@@ -26,8 +25,9 @@ export default {
             isInNativeApp: reApi.isInNativeApp,
             getPlatform: reApi.getPlatform,
             registerAppMsg: reApi.registerAppMsg,
-            reSendMessageToApp: reApi.reSendMessageToApp,
+            sendMsgWebToApp: reApi.sendMsgWebToApp,
             getInitUrlParam: reApi.getInitUrlParam,
+            webInit: reApi.webInit,
             cloose: reApi.cloose,
             popWebFull: reApi.popWebFull,
             setModelAlpha: reApi.setModelAlpha,
@@ -45,6 +45,9 @@ export default {
             time_compare: tool.time_compare,
             cam_defauleDataSet: tool.cam_defauleDataSet,
         };
+
+        app.config.globalProperties.$showLoading = showLoading;
+        app.config.globalProperties.$hideLoading = hideLoading;
     }
 }
 

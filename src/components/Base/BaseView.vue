@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2025-07-08 10:00:47
+ * @LastEditTime: 2025-07-15 09:40:03
 -->
 <template>
     <div class="sup-base-view">
@@ -41,23 +41,22 @@ const cloose_click = () => {
     height: 100vh;
     flex-direction: column;
     overflow: hidden;
-    // background-color: rgba($color: #23252b, $alpha: 0.9);
-    background-color: rgba($color: #525252, $alpha: 1.0);
-    // border-top-left-radius: 20px;
-    // border-top-right-radius: 20px;
+    background-color: rgba($color: #23252b, $alpha: 0.9);
+    // background-color: rgba($color: #525252, $alpha: 1.0);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
 }
 
 .cloose-area {
     position: relative;
     width: 100%;
-    height: 20px;
+    height: 30px;
     display: flex;
     justify-content: center;
-    align-items: center;
 
     .cloose-line {
         position: relative;
-        margin-top: 6px;
+        margin-top: 10px;
         width: 40px;
         height: 4px;
         border-radius: 2px;

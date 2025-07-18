@@ -1,20 +1,27 @@
 /*
  * @Author: Lemon C
  * @Date: 2022-11-08 11:58:14
- * @LastEditTime: 2025-07-07 14:34:41
+ * @LastEditTime: 2025-07-16 17:15:57
  */
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import { useStateStore } from '@/stores/state';
+
+
 const RE_ServerURl = "https://engine3.bjblackhole.com";
 
-// 创建axios实例
+
+
+// 创建axios实例, 这里静态创建不填写动态值
 const service: AxiosInstance = axios.create({
-    baseURL: sessionStorage.getItem('RE_private_serverUrl') || RE_ServerURl,
     timeout: 30000,
 });
 
-// 请求拦截器：统一处理token
-service.interceptors.request.use((config) => {
-    const token = (window as any).$service.token || (window as any).$service.tokenId || '';
+// 请求拦截器：动态设置值，这里可以处理header
+service.interceptors.request.use((config: any) => {
+    const state_store = useStateStore();
+    const token = state_store.token || '';
+    config.baseURL = state_store.baseUrl || RE_ServerURl;
+
     config.headers = config.headers || {};
     config.headers.Authorization = token;
     return config;

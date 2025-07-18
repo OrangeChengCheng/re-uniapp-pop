@@ -7,6 +7,9 @@
             <div class="message"><strong>接收【发送消息】:</strong> {{ mobileMessage }}</div>
             <button @click="click_showCad()">{{ isShowCad ? '关闭查看图纸' : '查看图纸' }}</button>
             <button @click="sendMessageToMobile()">发送到 移动端</button>
+            <button @click="setModelColor()">设置模型构件颜色</button>
+            <button @click="resetModelColor()">重置模型构件颜色</button>
+            <button @click="clearModelSel()">清空选择集</button>
         </div>
     </base-view>
 </template>
@@ -24,7 +27,7 @@ const isShowCad = ref(false);
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handleMobileMessage);
-    NativeBridge.getInitUrlParam();
+    // NativeBridge.getInitUrlParam();
 });
 
 // 处理从 移动端 接收的消息
@@ -57,7 +60,7 @@ const sendMessageToMobile = () => {
             },
         },
     };
-    NativeBridge.reSendMessageToApp(sendData);
+    NativeBridge.sendMsgWebToApp(sendData);
     console.log('已发送消息到 移动端:', JSON.stringify(sendData));
 };
 const sendMessageToMobileCloose = () => {
@@ -67,6 +70,23 @@ const sendMessageToMobileCloose = () => {
 const click_showCad = () => {
     isShowCad.value = !isShowCad.value;
     NativeBridge.popWebFull(isShowCad.value);
+};
+
+const setModelColor = () => {
+    NativeBridge.setModelColor({
+        dataSetId: 'res_hushizhan',
+        elemIdList: [22], // 空数组代表整个数据集
+        elemClr: [255, 0, 0, 255], //构件颜色 rgba
+    });
+};
+const resetModelColor = () => {
+    NativeBridge.resetModelColor({
+        dataSetId: 'res_hushizhan',
+        elemIdList: [22], // 空数组代表整个数据集
+    });
+};
+const clearModelSel = () => {
+    NativeBridge.clearModelSel();
 };
 </script>
 

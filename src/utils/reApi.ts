@@ -1,16 +1,19 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-07 14:31:51
+ * @LastEditTime: 2025-07-16 18:01:03
  */
+
+import { useStateStore } from '@/stores/state';
 
 
 interface ApiMethods {
     isInNativeApp(): any;
     getPlatform(): string;
     registerAppMsg(callback: Function): void;
-    reSendMessageToApp(data: any): void;
+    sendMsgWebToApp(data: any): void;
     getInitUrlParam(): any;
+    webInit(): void;
     cloose(): void;
     popWebFull(data: any): void;
     setModelAlpha(data: any): void;
@@ -53,7 +56,7 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 发送消息到原生应用
-    reSendMessageToApp: (data: any): void => {
+    sendMsgWebToApp: (data: any): void => {
         const platform = api.getPlatform();
         const messageString = typeof data === 'string' ? data : JSON.stringify(data);
 
@@ -67,7 +70,7 @@ const api: ApiMethods = {
 
             case 'android':
                 // Android 通信
-                (window as any).REMobileApp.reSendMessageToApp(messageString); // Android可以注册多个方法供Web调用
+                (window as any).REMobileApp.sendMsgWebToApp(messageString); // Android可以注册多个方法供Web调用
                 break;
 
             case 'web':
@@ -96,15 +99,28 @@ const api: ApiMethods = {
         params.forEach((value, key) => {
             result[key] = value;
         });
-        //更新服务配置
+        //更新基础配置
+        const state_store = useStateStore();
         if (result.baseUrl && result.baseUrl.length > 0) {
             (window as any).$service.update_serverUrl(result.baseUrl);
+            state_store.updateCurrBaseUrl(result.baseUrl);
         }
         if (result.token && result.token.length > 0) {
             (window as any).$service.update_token(result.token);
+            state_store.updateCurrToken(result.token);
         }
+
         console.log('接收到的参数:', JSON.stringify(result));
         return result;
+    },
+
+    // MARK re-api Web初始化
+    webInit: (): void => {
+        let sendData: any = {
+            type: 'webOnMounted',
+            data: {},
+        };
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 关闭窗口
@@ -113,7 +129,7 @@ const api: ApiMethods = {
             type: 'cloose',
             data: {},
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 关闭窗口
@@ -124,7 +140,7 @@ const api: ApiMethods = {
                 full: data
             },
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 设置模型构件透明度
@@ -133,7 +149,7 @@ const api: ApiMethods = {
             type: 'setModelAlpha',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 设置模型构件显隐
@@ -142,7 +158,7 @@ const api: ApiMethods = {
             type: 'setModelVisible',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 相机定位数据集
@@ -151,7 +167,7 @@ const api: ApiMethods = {
             type: 'locDataSet',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 相机定位目标
@@ -160,7 +176,7 @@ const api: ApiMethods = {
             type: 'setCamLocTo',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 获取相机信息
@@ -169,7 +185,7 @@ const api: ApiMethods = {
             type: 'getCamLocInfo',
             data: {},
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 相机定位模型构件
@@ -178,7 +194,7 @@ const api: ApiMethods = {
             type: 'locElem',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 设置模型构件颜色
@@ -187,7 +203,7 @@ const api: ApiMethods = {
             type: 'setModelColor',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 重置模型构件颜色
@@ -196,7 +212,7 @@ const api: ApiMethods = {
             type: 'resetModelColor',
             data: data,
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
     // MARK re-api 清除所有选择集
@@ -205,7 +221,7 @@ const api: ApiMethods = {
             type: 'clearModelSel',
             data: {},
         };
-        api.reSendMessageToApp(sendData);
+        api.sendMsgWebToApp(sendData);
     },
 
 }

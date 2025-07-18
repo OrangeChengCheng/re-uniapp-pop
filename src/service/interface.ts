@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-04-19 12:22:25
- * @LastEditTime: 2025-07-04 17:40:00
+ * @LastEditTime: 2025-07-17 14:22:44
  */
 import { requestPost, requestGet } from '@/service/request';
 
@@ -55,4 +55,27 @@ export function getViewAngleService(data: any) {
 // 分享查看界面获取开挖纹理列表
 export function getSharedExtrudeTexturesList() {
     return requestGet('/sceneTree/v3/getSceneExcavateIntrinsicTextureImages');
+}
+
+
+
+// MOD-- 属性 相关
+// 查询模型属性
+export function getProjectParam(data: any) {
+    return requestPost('/element/v3/getElementParam', data);
+}
+
+// 获取矢量属性信息
+export function getVectorAttrService(data: any) {
+    return requestPost('/element/v3/getVectorParam', data);
+}
+
+// 查询构件属性类型
+export function getElemParamTypeService(data: any) {
+    return requestPost('/componentLibrary/v3/getComponentParamTypes', data);
+}
+
+// 查询构件属性
+export function getElemParamService(data: any) {
+    return requestPost('/componentLibrary/v3/getComponentProperty', data);
 }
