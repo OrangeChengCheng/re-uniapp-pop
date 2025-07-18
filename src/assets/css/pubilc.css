@@ -1,0 +1,20 @@
+
+
+:deep(.el-popper) {
+    background-color: red;
+
+
+    .el-select__popper {
+        background-color: #2580ff;
+    }
+    .el-select__popper.el-popper {
+        background: red;
+    }
+    .el-popper {
+        background: gold;
+    }
+    .el-popper.is-light,
+    .el-popper.is-light > .el-popper__arrow:before {
+        background: aqua;
+    }
+}
