@@ -1,10 +1,9 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2025-07-16 17:48:31
+ * @LastEditTime: 2025-07-18 12:02:02
  */
 import { defineStore } from 'pinia'
-import { getSharedExtrudeTexturesList } from '@/service/interface'
 
 /**
     0 BIM模型
@@ -24,9 +23,10 @@ import { getSharedExtrudeTexturesList } from '@/service/interface'
 */
 
 interface StateMold {
-    baseUrl: String,
-    token: String,
-    appCurrSelElemId: Number,
+    baseUrl: string,
+    token: string,
+    shareType: number,
+    sceneId: string,
 }
 
 
@@ -34,7 +34,8 @@ export const useStateStore = defineStore('state', {
     state: (): StateMold => ({
         baseUrl: "",// app当前服务配置
         token: "",// app当前token
-        appCurrSelElemId: 0,// app当前选择的构件id
+        shareType: 0,// 0：无 1：模型 2：场景
+        sceneId: "",// app当前场景id，shareType=1代表数据集id  shareType=2代表场景id
     }),
     actions: {
 
@@ -48,9 +49,15 @@ export const useStateStore = defineStore('state', {
             this.token = token;
         },
 
-        // MARK 更新当前选择的构件id
-        updateCurrSelElemId(elemId: number) {
-            this.appCurrSelElemId = elemId;
+        // MARK 更新当前的shareType
+        updateCurrShareType(shareType: number) {
+            this.shareType = shareType;
         },
+
+        // MARK 更新当前的sceneId
+        updateCurrSceneId(sceneId: string) {
+            this.sceneId = sceneId;
+        },
+
     }
 });

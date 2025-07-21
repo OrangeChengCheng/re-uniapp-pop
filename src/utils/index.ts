@@ -1,31 +1,28 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-07-18 09:56:39
+ * @LastEditTime: 2025-07-21 14:30:32
  */
 import config from './config'
 import reApi from './reApi'
 import tool from './tool'
+import serviceApi from './serviceApi'
 import { showLoading, hideLoading } from './loading'
 
 export default {
     install(app: any) {
         (window as any).$service = {
-            serverUrl: config.getServerUrl(),
-            token: config.getToken(),
-            downloadUrl: config.getDownloadUrl(),
-            commonTimeout: config.getTimeout(),
-            update_serverUrl: config.updateServerUrl,
-            get_serverUrl: config.getServerUrl,
-            update_token: config.updateToken,
-            get_token: config.getToken,
+            getSharedProjectTree: serviceApi.getSharedProjectTree,
+            getSharedProjectTreeSubNodesByLazy: serviceApi.getSharedProjectTreeSubNodesByLazy,
+            getSharedProjectTreeSubNodes: serviceApi.getSharedProjectTreeSubNodes,
+            getSharedProjectTreeChildrenByLazy: serviceApi.getSharedProjectTreeChildrenByLazy,
+            getSharedProjectTreeChildren: serviceApi.getSharedProjectTreeChildren,
         };
 
         (window as any).$reapi = {
             isInNativeApp: reApi.isInNativeApp,
             getPlatform: reApi.getPlatform,
             registerAppMsg: reApi.registerAppMsg,
-            sendMsgWebToApp: reApi.sendMsgWebToApp,
             getInitUrlParam: reApi.getInitUrlParam,
             webInit: reApi.webInit,
             cloose: reApi.cloose,
@@ -39,6 +36,12 @@ export default {
             setModelColor: reApi.setModelColor,
             resetModelColor: reApi.resetModelColor,
             clearModelSel: reApi.clearModelSel,
+            addToSel: reApi.addToSel,
+            addToSelAttr: reApi.addToSelAttr,
+            setCamLocToWater: reApi.setCamLocToWater,
+            setCamLocToExtrude: reApi.setCamLocToExtrude,
+            getDataSetBV: reApi.getDataSetBV,
+            getGridDataSetBV: reApi.getGridDataSetBV,
         };
         (window as any).$tool = {
             url_handle: tool.url_handle,

@@ -4,7 +4,6 @@
  * @LastEditTime: 2025-06-03 10:19:14
  */
 
-import { getSceneById, getProjectTree } from '@/service/interface';
 
 interface ApiMethods {
     url_handle(url: string): any;
@@ -61,7 +60,7 @@ const api: ApiMethods = {
             _dataType = dataTypeEndIndex !== -1 ? url.substring(dataTypeIndex + 'dataType='.length, dataTypeEndIndex) : url.substring(dataTypeIndex + 'dataType='.length);
         }
 
-        let params = { url: url, shareType: shareType, projName: "", id: _id, token: _token, shareViewMode: _viewMode, shareDataType: _dataType };        
+        let params = { url: url, shareType: shareType, projName: "", id: _id, token: _token, shareViewMode: _viewMode, shareDataType: _dataType };
         // uni.$re.unipluginLog('params = ' + JSON.stringify(params));
         return params;
     },
@@ -95,58 +94,6 @@ const api: ApiMethods = {
 }
 
 
-// // MARK Service 获取项目名称
-// const getProjName = (params: any): Promise<any> => {
-//     return new Promise<any>((resolve, reject) => {
-//         if (params.shareType === 2) {
-//             getSceneInfo(params.id)
-//                 .then((res) => {
-//                     resolve(res?.sceneName);
-//                 })
-//                 .catch((err) => {
-//                     reject(err);
-//                 });
-//         } else {
-//             getModelTree({ dataSetId: params.id })
-//                 .then((res) => {
-//                     let find_obj = res?.find((item: any) => item.dataSetId === params.id);
-//                     if (find_obj) {
-//                         resolve(find_obj.dataSetName);
-//                     } else {
-//                         reject('项目查询失败');
-//                     }
-//                 })
-//                 .catch((err) => {
-//                     reject(err);
-//                 });
-//         }
-//     });
-// };
 
-// // MARK Service 获取模型目录树
-// const getModelTree = (paran: any): Promise<any> => {
-//     return new Promise<any>((resolve, reject) => {
-//         getProjectTree(paran).then((res) => {
-//             if (res.data) {
-//                 resolve(res.data);
-//             } else {
-//                 reject(new Error('模型目录树获取失败！'));
-//             }
-//         });
-//     });
-// };
-
-// // MARK Service 获取场景信息
-// const getSceneInfo = (paran: any): Promise<any> => {
-//     return new Promise<any>((resolve, reject) => {
-//         getSceneById(paran).then((res) => {
-//             if (res.data) {
-//                 resolve(res.data);
-//             } else {
-//                 reject(new Error('场景目录树获取失败！'));
-//             }
-//         });
-//     });
-// };
 
 export default api;

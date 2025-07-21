@@ -1,17 +1,28 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-16 18:01:03
+ * @LastEditTime: 2025-07-21 17:32:30
  */
 
 import { useStateStore } from '@/stores/state';
+
+// 消息格式定义
+interface BridgeMsg {
+    msgId: string;          // 唯一标识消息
+    type: string;           // 操作类型
+    data: any;              // 数据
+    isResponse?: boolean;   // 是否为响应消息
+}
+
+// 存储消息回调的 Map
+const BridgeMsgCallbackList = new Map<string, Function>();
 
 
 interface ApiMethods {
     isInNativeApp(): any;
     getPlatform(): string;
     registerAppMsg(callback: Function): void;
-    sendMsgWebToApp(data: any): void;
+    sendMsgWebToApp(type: string, data?: any, callback?: Function): void;
     getInitUrlParam(): any;
     webInit(): void;
     cloose(): void;
@@ -25,6 +36,12 @@ interface ApiMethods {
     setModelColor(data: any): void;
     resetModelColor(data: any): void;
     clearModelSel(): void;
+    addToSel(data: any): void;
+    addToSelAttr(data: any): void;
+    setCamLocToWater(data: any): void;
+    setCamLocToExtrude(data: any): void;
+    getDataSetBV(data: any): Promise<any>;
+    getGridDataSetBV(data: any): Promise<any>;
 }
 
 const api: ApiMethods = {
@@ -51,14 +68,38 @@ const api: ApiMethods = {
         }
         // 初始化：将回调函数挂载到 window 对象上，供 移动端 调用
         (window as any).REWebApp = {
-            onAppToWebMessage: callback,
+            onAppToWebMessage: (msg: string) => {
+                const bridgeMsg: BridgeMsg = JSON.parse(msg);
+                if (bridgeMsg.isResponse && bridgeMsg.msgId) {
+                    // 如果是响应消息，查找对应的回调函数
+                    const bridgeCallback = BridgeMsgCallbackList.get(bridgeMsg.msgId);
+                    if (bridgeCallback) {
+                        bridgeCallback(bridgeMsg.data);
+                        BridgeMsgCallbackList.delete(bridgeMsg.msgId); // 执行后删除回调
+                    }
+                } else {
+                    callback(msg);
+                }
+            },
         };
     },
 
     // MARK re-api 发送消息到原生应用
-    sendMsgWebToApp: (data: any): void => {
+    sendMsgWebToApp: (type: string, data?: any, callback?: Function): void => {
+        const msgId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+        const bridgeMsg: BridgeMsg = {
+            msgId: msgId,
+            type: type,
+            data: data ? data : {},
+            isResponse: false
+        };
+
+        if (callback) {
+            BridgeMsgCallbackList.set(msgId, callback);
+        }
+
         const platform = api.getPlatform();
-        const messageString = typeof data === 'string' ? data : JSON.stringify(data);
+        const messageString = JSON.stringify(bridgeMsg);
 
         console.log(`向 ${platform} 发送消息:`, messageString);
 
@@ -102,12 +143,19 @@ const api: ApiMethods = {
         //更新基础配置
         const state_store = useStateStore();
         if (result.baseUrl && result.baseUrl.length > 0) {
-            (window as any).$service.update_serverUrl(result.baseUrl);
             state_store.updateCurrBaseUrl(result.baseUrl);
         }
+
         if (result.token && result.token.length > 0) {
-            (window as any).$service.update_token(result.token);
             state_store.updateCurrToken(result.token);
+        }
+
+        if (result.shareType && result.shareType.length > 0) {
+            state_store.updateCurrShareType(Number(result.shareType));
+        }
+
+        if (result.sceneId && result.sceneId.length > 0) {
+            state_store.updateCurrSceneId(result.sceneId);
         }
 
         console.log('接收到的参数:', JSON.stringify(result));
@@ -116,112 +164,103 @@ const api: ApiMethods = {
 
     // MARK re-api Web初始化
     webInit: (): void => {
-        let sendData: any = {
-            type: 'webOnMounted',
-            data: {},
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('webOnMounted');
     },
 
     // MARK re-api 关闭窗口
     cloose: (): void => {
-        let sendData: any = {
-            type: 'cloose',
-            data: {},
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp("cloose");
     },
 
     // MARK re-api 关闭窗口
     popWebFull: (data: any): void => {
         let sendData: any = {
-            type: 'popWebFull',
-            data: {
-                full: data
-            },
+            full: data
         };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp("popWebFull", sendData);
     },
 
     // MARK re-api 设置模型构件透明度
     setModelAlpha: (data: any): void => {
-        let sendData: any = {
-            type: 'setModelAlpha',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('setModelAlpha', data);
     },
 
     // MARK re-api 设置模型构件显隐
     setModelVisible: (data: any): void => {
-        let sendData: any = {
-            type: 'setModelVisible',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('setModelVisible', data);
     },
 
     // MARK re-api 相机定位数据集
     locDataSet: (data: any): void => {
-        let sendData: any = {
-            type: 'locDataSet',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('locDataSet', data);
     },
 
     // MARK re-api 相机定位目标
     setCamLocTo: (data: any): void => {
-        let sendData: any = {
-            type: 'setCamLocTo',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('setCamLocTo', data);
     },
 
     // MARK re-api 获取相机信息
     getCamLocInfo: (): void => {
-        let sendData: any = {
-            type: 'getCamLocInfo',
-            data: {},
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('getCamLocInfo');
     },
 
     // MARK re-api 相机定位模型构件
     locElem: (data: any): void => {
-        let sendData: any = {
-            type: 'locElem',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('locElem', data);
     },
 
     // MARK re-api 设置模型构件颜色
     setModelColor: (data: any): void => {
-        let sendData: any = {
-            type: 'setModelColor',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('setModelColor', data);
     },
 
     // MARK re-api 重置模型构件颜色
     resetModelColor: (data: any): void => {
-        let sendData: any = {
-            type: 'resetModelColor',
-            data: data,
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('resetModelColor', data);
     },
 
     // MARK re-api 清除所有选择集
     clearModelSel: (): void => {
-        let sendData: any = {
-            type: 'clearModelSel',
-            data: {},
-        };
-        api.sendMsgWebToApp(sendData);
+        api.sendMsgWebToApp('clearModelSel');
+    },
+
+    // MARK re-api 添加到选择集
+    addToSel: (data: any): void => {
+        api.sendMsgWebToApp('addToSel', data);
+    },
+
+    // MARK re-api 设置选择集属性
+    addToSelAttr: (data: any): void => {
+        api.sendMsgWebToApp('addToSelAttr', data);
+    },
+
+    // MARK re-api 相机定位水面
+    setCamLocToWater: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocToWater', data);
+    },
+
+    // MARK re-api 相机定位挤出
+    setCamLocToExtrude: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocToExtrude', data);
+    },
+
+    // MARK re-api 获取数据集总包围盒信息
+    getDataSetBV: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getDataSetBV', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+    // MARK re-api 获取Grid数据集总包围盒信息
+    getGridDataSetBV: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getGridDataSetBV', data, (response: any) => {
+                resolve(response);
+            });
+        });
     },
 
 }
