@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2022-11-08 11:58:14
- * @LastEditTime: 2025-07-16 17:15:57
+ * @LastEditTime: 2025-07-22 14:37:21
  */
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { useStateStore } from '@/stores/state';
@@ -56,7 +56,8 @@ service.interceptors.response.use(
  * token检查函数
  */
 function checkToken() {
-    const token = sessionStorage.getItem('RE_Token');
+    const state_store = useStateStore();
+    const token = state_store.token
     if (!token || token.length <= 0) {
         console.log('链接无效，请联系管理员!');
         return false;

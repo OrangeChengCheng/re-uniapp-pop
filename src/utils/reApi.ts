@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-21 17:32:30
+ * @LastEditTime: 2025-07-22 19:43:43
  */
 
 import { useStateStore } from '@/stores/state';
@@ -31,17 +31,24 @@ interface ApiMethods {
     setModelVisible(data: any): void;
     locDataSet(data: any): void;
     setCamLocTo(data: any): void;
+    setCamLocToBound(data: any): void;
     getCamLocInfo(): void;
     locElem(data: any): void;
     setModelColor(data: any): void;
-    resetModelColor(data: any): void;
-    clearModelSel(): void;
+    resetElemAttr(data: any): void;
+    delAllSelElems(): void;
     addToSel(data: any): void;
-    addToSelAttr(data: any): void;
+    setSelElemsAttr(data: any): void;
     setCamLocToWater(data: any): void;
     setCamLocToExtrude(data: any): void;
-    getDataSetBV(data: any): Promise<any>;
+    getBIMDataSetBV(data: any): Promise<any>;
     getGridDataSetBV(data: any): Promise<any>;
+    getTerrId(data: any): Promise<any>;
+    getAllUnitNames(data: any): Promise<any>;
+    waterVisible(data: any): void;
+    extrudeVisible(data: any): void;
+    setUnitActive(data: any): void;
+    setGridValidState(data: any): void;
 }
 
 const api: ApiMethods = {
@@ -116,7 +123,7 @@ const api: ApiMethods = {
 
             case 'web':
                 // Web 环境下的处理（可用于调试）
-                console.log('Web 环境下，模拟发送消息:', data);
+                console.log('Web 环境下，模拟发送消息:', bridgeMsg);
                 break;
         }
     },
@@ -200,6 +207,11 @@ const api: ApiMethods = {
         api.sendMsgWebToApp('setCamLocTo', data);
     },
 
+    // MARK re-api 相机定位包围盒
+    setCamLocToBound: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocToBound', data);
+    },
+
     // MARK re-api 获取相机信息
     getCamLocInfo: (): void => {
         api.sendMsgWebToApp('getCamLocInfo');
@@ -216,13 +228,13 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 重置模型构件颜色
-    resetModelColor: (data: any): void => {
-        api.sendMsgWebToApp('resetModelColor', data);
+    resetElemAttr: (data: any): void => {
+        api.sendMsgWebToApp('resetElemAttr', data);
     },
 
     // MARK re-api 清除所有选择集
-    clearModelSel: (): void => {
-        api.sendMsgWebToApp('clearModelSel');
+    delAllSelElems: (): void => {
+        api.sendMsgWebToApp('delAllSelElems');
     },
 
     // MARK re-api 添加到选择集
@@ -231,8 +243,8 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 设置选择集属性
-    addToSelAttr: (data: any): void => {
-        api.sendMsgWebToApp('addToSelAttr', data);
+    setSelElemsAttr: (data: any): void => {
+        api.sendMsgWebToApp('setSelElemsAttr', data);
     },
 
     // MARK re-api 相机定位水面
@@ -246,9 +258,9 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 获取数据集总包围盒信息
-    getDataSetBV: (data: any): Promise<any> => {
+    getBIMDataSetBV: (data: any): Promise<any> => {
         return new Promise((resolve) => {
-            api.sendMsgWebToApp('getDataSetBV', data, (response: any) => {
+            api.sendMsgWebToApp('getBIMDataSetBV', data, (response: any) => {
                 resolve(response);
             });
         });
@@ -261,6 +273,44 @@ const api: ApiMethods = {
                 resolve(response);
             });
         });
+    },
+
+    // MARK re-api 获取全局地形实例标识
+    getTerrId: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getTerrId', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+    // MARK re-api 获取所有的地形数据层单元名称
+    getAllUnitNames: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getAllUnitNames', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+    // MARK re-api 层单元的激活状态
+    setUnitActive: (data: any): void => {
+        api.sendMsgWebToApp('setUnitActive', data);
+    },
+
+    // MARK re-api 设置瓦片的有效性
+    setGridValidState: (data: any): void => {
+        api.sendMsgWebToApp('setGridValidState', data);
+    },
+
+    // MARK re-api 水面显隐
+    waterVisible: (data: any): void => {
+        api.sendMsgWebToApp('waterVisible', data);
+    },
+
+    // MARK re-api 挤出显隐
+    extrudeVisible: (data: any): void => {
+        api.sendMsgWebToApp('extrudeVisible', data);
     },
 
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-04-19 12:22:25
- * @LastEditTime: 2025-07-21 11:57:33
+ * @LastEditTime: 2025-07-22 14:35:00
  */
 import { requestPost, requestGet } from '@/service/request';
 
@@ -10,6 +10,11 @@ import { requestPost, requestGet } from '@/service/request';
 
 
 // MOD-- 目录树 相关
+
+// 根据树id查询树
+export function getSharedProjectSceneTree(data: any) {
+    return requestPost('/sceneTree/v3/getTreeById', data);
+}
 
 // 获取模型目录树
 export function getSharedProjectTree(data: any) {

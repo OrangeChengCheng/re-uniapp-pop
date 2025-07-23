@@ -24,7 +24,7 @@ import PropertyModel from '@/components/Property/PropertyModel.vue';
 import PropertyEntity from '@/components/Property/PropertyEntity.vue';
 import PropertyShp from '@/components/Property/PropertyShp.vue';
 import EmptyComp from '@/components/Empty/EmptyComp.vue';
-import { getProjectParam, getVectorAttrService, getElemParamTypeService, getElemParamService } from '@/service/interface';
+import { getSharedProjectParam, getSharedVectorParam, getElemParamTypeService, getElemParamService } from '@/service/interface';
 import { useStateStore } from '@/stores/state';
 
 const state_store = useStateStore();
@@ -86,7 +86,7 @@ const server_getAttrData_model = (re_selModel: any) => {
         elementIntId: re_selModel.probeInfo.elemId,
         isQueryExtend: true,
     };
-    getProjectParam(params).then((res) => {
+    getSharedProjectParam(params).then((res) => {
         instance?.proxy.$hideLoading();
         if (res.isSuccess) {
             handle_modelData(res.data);
@@ -112,7 +112,7 @@ const server_getAttrData_shp = (re_selModel: any) => {
     if (!findObj) return;
 
     let params = { dataSetId: findObj.dataSetId, elemId: shpElemId };
-    getVectorAttrService(params).then((res) => {
+    getSharedVectorParam(params).then((res) => {
         instance?.proxy.$hideLoading();
         if (res.isSuccess) {
             handle_shpData(res.data);

@@ -1,11 +1,12 @@
 /*
  * @Author: Lemon C
  * @Date: 2025-07-21 10:25:29
- * @LastEditTime: 2025-07-21 11:57:59
+ * @LastEditTime: 2025-07-22 12:25:08
  */
-import { getSharedProjectTree, getSharedProjectTreeSubNodesByLazy, getSharedProjectTreeSubNodes, getSharedProjectTreeChildrenByLazy, getSharedProjectTreeChildren } from '@/service/interface';
+import { getSharedProjectSceneTree, getSharedProjectTree, getSharedProjectTreeSubNodesByLazy, getSharedProjectTreeSubNodes, getSharedProjectTreeChildrenByLazy, getSharedProjectTreeChildren } from '@/service/interface';
 
 interface ApiMethods {
+    getSharedProjectSceneTree(paran: any): Promise<any>;
     getSharedProjectTree(paran: any): Promise<any>;
     getSharedProjectTreeSubNodesByLazy(paran: any): Promise<any>;
     getSharedProjectTreeSubNodes(paran: any): Promise<any>;
@@ -14,6 +15,17 @@ interface ApiMethods {
 }
 
 const api: ApiMethods = {
+    // MARK 根据树id查询树
+    getSharedProjectSceneTree: (paran: any): Promise<any> => {
+        return new Promise<any>((resolve) => {
+            getSharedProjectSceneTree(paran).then((res) => {
+                if (res.isSuccess) {
+                    resolve(res.data);
+                }
+            });
+        });
+    },
+
     // MARK 获取树目录
     getSharedProjectTree: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
