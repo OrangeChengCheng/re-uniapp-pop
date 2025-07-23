@@ -1,22 +1,23 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-07-15 15:24:38
+ * @LastEditTime: 2025-07-23 09:46:30
 -->
 <template>
     <base-view>
         <div class="tree-container">
-            <button @click="sendMessageToMobileCloose()">关闭【目录树弹窗】</button>
-            <div>Web 与 移动端 通信示例</div>
-            <div class="message"><strong>接收【初始化消息】:</strong> {{ initAppToWebMsg }}</div>
-            <div class="message"><strong>接收【发送消息】:</strong> {{ mobileMessage }}</div>
-            <button @click="click_setModelVisible()">{{ modelVisible ? '隐藏模型' : '显示模型' }}</button>
-            <button @click="click_setModelAlpha()">设置模型构件透明度</button>
-            <button @click="click_locDataSet()">相机定位数据集</button>
-            <button @click="click_locElem()">相机定位构件</button>
-            <button @click="click_setLoc()">相机定位目标方位</button>
-            <button @click="click_getLoc()">获取相机信息</button>
-            <button @click="sendMessageToMobile()">发送到 移动端</button>
+            <scene-tree
+                v-if="state_store.shareType == 2"
+                :sceneId="state_store.sceneId"
+                :camToWater="re_camToWater"
+                :camToExtrude="re_camToExtrude"
+                :camToElem="re_camToElem"
+                :camToDataSet="re_camToDataSet"
+                :waterVisible="re_waterVisible"
+                :extrudeVisible="re_extrudeVisible"
+                :dataSetVisible="re_dataSetVisible"
+                :elemVisible="re_elemVisible"></scene-tree>
+            <empty-comp v-else></empty-comp>
         </div>
     </base-view>
 </template>
@@ -25,106 +26,163 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import BaseView from '@/components/Base/BaseView.vue';
-import { getSharedExtrudeTexturesList } from '@/service/interface';
+import EmptyComp from '@/components/Empty/EmptyComp.vue';
+import SceneTree from '@/components/Tree/SceneTree.vue';
+import { useStateStore } from '@/stores/state';
 
-const initAppToWebMsg = ref('');
-const mobileMessage = ref('');
-const modelVisible = ref(true);
-
+const state_store = useStateStore();
 const NativeBridge = (window as any).$reapi;
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handleMobileMessage);
-    // NativeBridge.getInitUrlParam();
-    getSharedExtrudeTexturesList()
-        .then((res) => {
-            console.log(res);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
 });
 
 // 处理从 移动端 接收的消息
 const handleMobileMessage = (message: any) => {
     console.log('收到 移动端 消息:', message);
     // 更新 Vue 状态或执行其他操作
-    mobileMessage.value = message;
 };
 
-// 发送消息到 移动端
-const sendMessageToMobile = () => {
-    let sendData = {
-        type: 'sendMsg',
-        data: {
-            aaa: [
-                {
-                    bbb: 'https://www.baidu.com',
-                    ccc: true,
-                    ddd: {
-                        eee: [1, 2, 3],
-                    },
-                    fff: 666,
-                },
-            ],
-            hhh: false,
-            ggg: 888,
-            iii: {
-                jjj: 'abc',
-                kkk: [6, 5, 4],
-            },
-        },
-    };
-    NativeBridge.sendMsgWebToApp(sendData);
-    console.log('已发送消息到 移动端:', JSON.stringify(sendData));
+// MARK Engine 定位水面
+const re_camToWater = (e: any) => {
+    NativeBridge.setCamLocToWater({ waterNameList: e });
 };
-const sendMessageToMobileCloose = () => {
-    NativeBridge.cloose();
+
+// MARK Engine 定位挤出
+const re_camToExtrude = (e: any) => {
+    NativeBridge.setCamLocToExtrude({ extrudeIdst: e });
 };
-const click_setModelAlpha = () => {
-    NativeBridge.setModelAlpha({
-        alpha: 128,
-        dataSetId: 'res_hushizhan',
-        elemIdList: [22],
+
+// MARK Engine 定位数据集
+const re_camToDataSet = (dataSetList: any, isClearSel: boolean) => {
+    if (isClearSel) {
+        NativeBridge.delAllSelElemss();
+    }
+
+    const terrainType = [10, 13, 21, 22];
+    if (dataSetList.length === 1) {
+        let dataSetInfo = dataSetList[0];
+        let dataSetId = dataSetInfo.dataSetId;
+        let locType = 'CAM_DIR_DEFAULT';
+        if (terrainType.includes(dataSetInfo.dataSetType)) {
+            locType = 'CAM_DIR_TOP';
+        } else {
+            locType = 'CAM_DIR_TOPRIGHTBACK';
+        }
+        NativeBridge.locDataSet({ dataSetId: dataSetId, backDepth: 1.0, locType: locType });
+    } else {
+        let bbox = handle_mergeBBox(dataSetList);
+        let isIncludesTerrainType = dataSetList.some((el: any) => terrainType.includes(el.dataSetType));
+        let locType = 'CAM_DIR_DEFAULT';
+        if (isIncludesTerrainType) {
+            locType = 'CAM_DIR_TOP';
+        } else {
+            locType = 'CAM_DIR_TOPRIGHTBACK';
+        }
+        NativeBridge.setCamLocToBound({ arrBound: bbox, backDepth: 1.0, locType: locType });
+    }
+};
+
+// MARK Engine 定位单构件
+const re_camToElem = (dataSetList: any, isFocus: boolean, isHighLight: boolean) => {
+    NativeBridge.delAllSelElems();
+
+    if (isFocus) {
+        let locIDList: any = [];
+        dataSetList.forEach((item: any) => {
+            let obj = {
+                dataSetId: item.dataSetId,
+                elemIdList: item.elemIds,
+            };
+            locIDList.push(obj);
+        });
+
+        NativeBridge.locElem({ locIDList: locIDList, backDepth: 1.0, locType: 'CAM_DIR_TOPRIGHTBACK' });
+    }
+
+    if (isHighLight) {
+        dataSetList.forEach((item: any) => {
+            NativeBridge.addToSel({ dataSetId: item.dataSetId, elemIdList: item.elemIds });
+        });
+        NativeBridge.setSelElemsAttr({ elemClr: [254, 64, 7, 180], probeMask: 1, attrValid: true });
+    }
+};
+
+// MARK Engine 水面显隐
+const re_waterVisible = (waterIds: any, visible: boolean) => {
+    waterIds.forEach((item: any) => {
+        NativeBridge.waterVisible({ waterName: item, visible: visible });
     });
 };
-const click_setModelVisible = () => {
-    modelVisible.value = !modelVisible.value;
-    NativeBridge.setModelVisible({
-        visible: modelVisible.value,
-        dataSetId: 'res_hushizhan',
-        elemIdList: [22],
+
+// MARK Engine 挤出显隐
+const re_extrudeVisible = (extrudeIds: any, visible: boolean) => {
+    extrudeIds.forEach((item: any) => {
+        NativeBridge.extrudeVisible({ extrudeId: item, visible: visible });
     });
 };
-const click_locDataSet = () => {
-    NativeBridge.locDataSet({
-        dataSetId: 'res_hushizhan',
-        backDepth: 1.0,
-    });
+
+// MARK Engine 数据集显隐
+const re_dataSetVisible = async (dataSetList: any, visible: boolean) => {
+    const elemDataSetType = [17, 18, 19];
+    // 用 for...of 替代 forEach，支持异步等待
+    for (const item of dataSetList) {
+        let { dataSetId, dataSetType } = item;
+        if (elemDataSetType.includes(dataSetType)) {
+            let elemId = item.elemId;
+            re_elemVisible(dataSetId, [elemId], visible);
+        } else {
+            if (dataSetType !== 0) {
+                let terrId = await NativeBridge.getTerrId({ dataSetId: dataSetId });
+                if (terrId) {
+                    let unitNames = await NativeBridge.getAllUnitNames({ dataSetId: dataSetId });
+                    let unitId = unitNames[0] ? unitNames[0] : '';
+                    let resType = 'ALL';
+                    NativeBridge.setUnitActive({ dataSetId: dataSetId, unitId: unitId, resType: resType, active: visible });
+                } else {
+                    NativeBridge.setGridValidState({ dataSetId: dataSetId, visible: visible });
+                }
+            } else {
+                re_elemVisible(dataSetId, [], visible);
+            }
+        }
+    }
 };
-const click_setLoc = () => {
-    NativeBridge.setCamLocTo({
-        camPos: [12654914.48635184, 4130009.3671415593, 17.31782443427872],
-        camRotate: [0.36157101126036134, -0.1404893305387332, -0.3338153488477842, 0.8591254068496466],
-        camDir: [0.4827918130284945, 0.5274746945418344, -0.6990583036418765],
-        locDelay: 0,
-        locTime: 0,
-    });
+
+// MARK Engine 构件显隐
+const re_elemVisible = (dataSetId: any, childNodeIds: any, visible: boolean) => {
+    NativeBridge.delAllSelElems();
+    if (visible) {
+        NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: childNodeIds });
+    } else {
+        NativeBridge.setModelAlpha({ dataSetId: dataSetId, elemIdList: childNodeIds, alpha: 0 });
+    }
 };
-const click_getLoc = () => {
-    const camLoc = NativeBridge.getCamLocInfo();
-    console.log(`camLoc: ${JSON.stringify(camLoc)}`);
-};
-const click_locElem = () => {
-    NativeBridge.locElem({
-        locIDList: [
-            {
-                dataSetId: 'res_hushizhan',
-                elemIdList: [22],
-            },
-        ],
-        backDepth: 1.0,
+
+// MARK Data 合并包围盒
+const handle_mergeBBox = async (dataSetList: any) => {
+    let xValue: any = [];
+    let yValue: any = [];
+    let zValue: any = [];
+
+    dataSetList.forEach((item: any) => {
+        let bbox;
+        if (item.dataSetType === 0) {
+            bbox = NativeBridge.getBIMDataSetBV({ dataSetId: item.dataSetId });
+        } else {
+            bbox = NativeBridge.getGridDataSetBV({ dataSetId: item.dataSetId });
+        }
+        xValue.push(bbox[0], bbox[1]);
+        yValue.push(bbox[2], bbox[3]);
+        zValue.push(bbox[4], bbox[5]);
     });
+
+    let totalBBox = [
+        [Math.min(...xValue), Math.min(...yValue), Math.min(...zValue)],
+        [Math.max(...xValue), Math.max(...yValue), Math.max(...zValue)],
+    ];
+
+    return totalBBox;
 };
 </script>
 
@@ -134,17 +192,9 @@ const click_locElem = () => {
     position: relative;
     width: 100%;
     height: 100%;
+    padding: 16px 20px 30px 20px;
+    box-sizing: border-box;
+    overflow: hidden;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    // background-color: red;
-    overflow: auto;
-    // padding-bottom: 50px;
-
-    button,
-    div {
-        position: relative;
-        margin-top: 20px;
-    }
 }
 </style>
