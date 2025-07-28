@@ -6,13 +6,13 @@
             <div class="message"><strong>接收【初始化消息】:</strong> {{ initAppToWebMsg }}</div>
             <div class="message"><strong>接收【发送消息】:</strong> {{ mobileMessage }}</div>
             <button @click="click_showCad()">{{ isShowCad ? '关闭查看图纸' : '查看图纸' }}</button>
-            <button @click="setModelColor()">设置模型构件颜色</button>
-            <button @click="resetModelColor()">重置模型构件颜色</button>
+            <button @click="setElemAttr()">设置模型构件颜色</button>
+            <button @click="resetElemAttr()">重置模型构件颜色</button>
             <button @click="clearModelSel()">清空选择集</button>
-            <button @click="click_setModelVisible()">{{ modelVisible ? '隐藏模型' : '显示模型' }}</button>
-            <button @click="click_setModelAlpha()">设置模型构件透明度</button>
-            <button @click="click_locDataSet()">相机定位数据集</button>
-            <button @click="click_locElem()">相机定位构件</button>
+            <button @click="click_setElemsValidState()">{{ modelVisible ? '隐藏模型' : '显示模型' }}</button>
+            <button @click="click_setElemAlpha()">设置模型构件透明度</button>
+            <button @click="click_setCamLocateToDataSet()">相机定位数据集</button>
+            <button @click="click_setCamLocateToElem()">相机定位构件</button>
             <button @click="click_setLoc()">相机定位目标方位</button>
             <button @click="click_getLoc()">获取相机信息</button>
             <button @click="click_getDataSetBBox()">获取包围盒信息</button>
@@ -53,14 +53,14 @@ const click_showCad = () => {
     NativeBridge.popWebFull(isShowCad.value);
 };
 
-const setModelColor = () => {
-    NativeBridge.setModelColor({
+const setElemAttr = () => {
+    NativeBridge.setElemAttr({
         dataSetId: 'res_hushizhan',
         elemIdList: [22], // 空数组代表整个数据集
         elemClr: [255, 0, 0, 255], //构件颜色 rgba
     });
 };
-const resetModelColor = () => {
+const resetElemAttr = () => {
     NativeBridge.resetElemAttr({
         dataSetId: 'res_hushizhan',
         elemIdList: [22], // 空数组代表整个数据集
@@ -69,29 +69,29 @@ const resetModelColor = () => {
 const clearModelSel = () => {
     NativeBridge.delAllSelElems();
 };
-const click_setModelAlpha = () => {
-    NativeBridge.setModelAlpha({
+const click_setElemAlpha = () => {
+    NativeBridge.setElemAlpha({
         alpha: 128,
         dataSetId: 'res_hushizhan',
         elemIdList: [22],
     });
 };
-const click_setModelVisible = () => {
+const click_setElemsValidState = () => {
     modelVisible.value = !modelVisible.value;
-    NativeBridge.setModelVisible({
+    NativeBridge.setElemsValidState({
         visible: modelVisible.value,
         dataSetId: 'res_hushizhan',
         elemIdList: [22],
     });
 };
-const click_locDataSet = () => {
-    NativeBridge.locDataSet({
+const click_setCamLocateToDataSet = () => {
+    NativeBridge.setCamLocateToDataSet({
         dataSetId: 'res_hushizhan',
         backDepth: 1.0,
     });
 };
 const click_setLoc = () => {
-    NativeBridge.setCamLocTo({
+    NativeBridge.setCamLocateTo({
         camPos: [12654914.48635184, 4130009.3671415593, 17.31782443427872],
         camRotate: [0.36157101126036134, -0.1404893305387332, -0.3338153488477842, 0.8591254068496466],
         camDir: [0.4827918130284945, 0.5274746945418344, -0.6990583036418765],
@@ -100,11 +100,11 @@ const click_setLoc = () => {
     });
 };
 const click_getLoc = () => {
-    const camLoc = NativeBridge.getCamLocInfo();
+    const camLoc = NativeBridge.getCamLocate();
     console.log(`camLoc: ${JSON.stringify(camLoc)}`);
 };
-const click_locElem = () => {
-    NativeBridge.locElem({
+const click_setCamLocateToElem = () => {
+    NativeBridge.setCamLocateToElem({
         locIDList: [
             {
                 dataSetId: 'res_hushizhan',
