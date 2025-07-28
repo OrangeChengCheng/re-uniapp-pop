@@ -1,5 +1,5 @@
 <template>
-    <base-view>
+    <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
         <div class="cad-container">
             <button @click="sendMessageToMobileCloose()">关闭【图纸弹窗】</button>
             <div>Web 与 移动端 通信示例</div>
@@ -33,12 +33,11 @@ const modelVisible = ref(true);
 const isShowCad = ref(false);
 
 onMounted(() => {
-    NativeBridge.registerAppMsg(handleMobileMessage);
-    // NativeBridge.getInitUrlParam();
+    
 });
 
 // 处理从 移动端 接收的消息
-const handleMobileMessage = (message: any) => {
+const handle_appToWebMsg = (message: any) => {
     console.log('收到 移动端 消息:', message);
     // 更新 Vue 状态或执行其他操作
     mobileMessage.value = message;

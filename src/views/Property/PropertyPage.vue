@@ -1,14 +1,16 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-07 14:58:27
- * @LastEditTime: 2025-07-18 10:14:50
+ * @LastEditTime: 2025-07-28 17:09:16
 -->
 <template>
-    <base-view>
+    <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
         <div class="peoperty-container">
-            <property-model v-if="propertyType == 1" :basic_list="modelAttrList_basic"
-                :extend_list="modelAttrList_extend"></property-model>
-            <property-entity v-else-if="propertyType == 2" :select_list="entityAttrTypeList" :attr_list="entityAttrList"
+            <property-model v-if="propertyType == 1" :basic_list="modelAttrList_basic" :extend_list="modelAttrList_extend"></property-model>
+            <property-entity
+                v-else-if="propertyType == 2"
+                :select_list="entityAttrTypeList"
+                :attr_list="entityAttrList"
                 :elselect_change="elselect_change"></property-entity>
             <property-shp v-else-if="propertyType == 3" :attr_list="shpAttrList"></property-shp>
             <empty-comp v-else :empty_title="'选择一个场景对象，查看其属性信息'"></empty-comp>
@@ -38,20 +40,15 @@ const shpAttrList = ref<any[]>([]);
 const entityAttrTypeList = ref<any[]>([]);
 const entityAttrList = ref<any[]>([]);
 
-
-onMounted(() => {
-    NativeBridge.registerAppMsg(handle_appToWebMsg);
-});
+onMounted(() => {});
 
 // MARK App->Web 接收App消息
 const handle_appToWebMsg = (msgData: any) => {
-    instance?.proxy.$showLoading();
-    console.log('收到 移动端 消息:', msgData);
     if (msgData) {
-        const appData = JSON.parse(msgData);
-        if (appData.type && appData.type == 'Probe.getCurCombProbeRet') {
-            server_getAttrData(appData.data);
-            re_selModel_cur.value = appData.data;
+        if (msgData.type == 'Probe.getCurCombProbeRet') {
+            instance?.proxy.$showLoading();
+            server_getAttrData(msgData.data);
+            re_selModel_cur.value = msgData.data;
             modelAttrList_basic.value = [];
             modelAttrList_extend.value = [];
             shpAttrList.value = [];

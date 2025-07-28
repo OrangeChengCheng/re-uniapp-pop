@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-07-28 11:08:07
+ * @LastEditTime: 2025-07-28 16:42:03
 -->
 <template>
     <base-view>
@@ -44,14 +44,9 @@ const state_store = useStateStore();
 const NativeBridge = (window as any).$reapi;
 
 onMounted(() => {
-    NativeBridge.registerAppMsg(handleMobileMessage);
+
 });
 
-// 处理从 移动端 接收的消息
-const handleMobileMessage = (message: any) => {
-    console.log('收到 移动端 消息:', message);
-    // 更新 Vue 状态或执行其他操作
-};
 
 // MARK Engine 定位水面
 const re_camToWater = (e: any) => {
