@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-07-23 09:46:30
+ * @LastEditTime: 2025-07-28 11:08:07
 -->
 <template>
     <base-view>
@@ -17,6 +17,15 @@
                 :extrudeVisible="re_extrudeVisible"
                 :dataSetVisible="re_dataSetVisible"
                 :elemVisible="re_elemVisible"></scene-tree>
+            <model-tree
+                v-else-if="state_store.shareType == 1"
+                :sceneId="state_store.sceneId"
+                :camToElem="re_camToElem"
+                :camToDataSet="re_camToDataSet"
+                :dataSetVisible="re_dataSetVisible"
+                :elemVisible="re_elemVisible"
+                :showRoom="re_showRoom"
+                :resetRoom="re_resetRoom"></model-tree>
             <empty-comp v-else></empty-comp>
         </div>
     </base-view>
@@ -28,6 +37,7 @@ import { ref, onMounted } from 'vue';
 import BaseView from '@/components/Base/BaseView.vue';
 import EmptyComp from '@/components/Empty/EmptyComp.vue';
 import SceneTree from '@/components/Tree/SceneTree.vue';
+import ModelTree from '@/components/Tree/ModelTree.vue';
 import { useStateStore } from '@/stores/state';
 
 const state_store = useStateStore();
@@ -54,55 +64,27 @@ const re_camToExtrude = (e: any) => {
 };
 
 // MARK Engine 定位数据集
-const re_camToDataSet = (dataSetList: any, isClearSel: boolean) => {
-    if (isClearSel) {
-        NativeBridge.delAllSelElemss();
-    }
+const re_camToDataSet = async (dataSetList: any, locType: string) => {
+    NativeBridge.delAllSelElems();
 
-    const terrainType = [10, 13, 21, 22];
     if (dataSetList.length === 1) {
         let dataSetInfo = dataSetList[0];
         let dataSetId = dataSetInfo.dataSetId;
-        let locType = 'CAM_DIR_DEFAULT';
-        if (terrainType.includes(dataSetInfo.dataSetType)) {
-            locType = 'CAM_DIR_TOP';
-        } else {
-            locType = 'CAM_DIR_TOPRIGHTBACK';
-        }
-        NativeBridge.locDataSet({ dataSetId: dataSetId, backDepth: 1.0, locType: locType });
+        NativeBridge.setCamLocateToDataSet({ dataSetId: dataSetId, backDepth: 1.0, locType: locType });
     } else {
-        let bbox = handle_mergeBBox(dataSetList);
-        let isIncludesTerrainType = dataSetList.some((el: any) => terrainType.includes(el.dataSetType));
-        let locType = 'CAM_DIR_DEFAULT';
-        if (isIncludesTerrainType) {
-            locType = 'CAM_DIR_TOP';
-        } else {
-            locType = 'CAM_DIR_TOPRIGHTBACK';
-        }
-        NativeBridge.setCamLocToBound({ arrBound: bbox, backDepth: 1.0, locType: locType });
+        let bbox = await handle_mergeBBox(dataSetList);
+        NativeBridge.setCamLocateToBound({ arrBound: bbox, backDepth: 1.0, locType: locType });
     }
 };
 
 // MARK Engine 定位单构件
-const re_camToElem = (dataSetList: any, isFocus: boolean, isHighLight: boolean) => {
+const re_camToElem = (locIDList: any, locType: string, isHighLight: boolean) => {
     NativeBridge.delAllSelElems();
-
-    if (isFocus) {
-        let locIDList: any = [];
-        dataSetList.forEach((item: any) => {
-            let obj = {
-                dataSetId: item.dataSetId,
-                elemIdList: item.elemIds,
-            };
-            locIDList.push(obj);
-        });
-
-        NativeBridge.locElem({ locIDList: locIDList, backDepth: 1.0, locType: 'CAM_DIR_TOPRIGHTBACK' });
-    }
+    NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 1.0, locType: locType });
 
     if (isHighLight) {
-        dataSetList.forEach((item: any) => {
-            NativeBridge.addToSel({ dataSetId: item.dataSetId, elemIdList: item.elemIds });
+        locIDList.forEach((item: any) => {
+            NativeBridge.addToSelElems({ dataSetId: item.dataSetId, elemIdList: item.elemIdList });
         });
         NativeBridge.setSelElemsAttr({ elemClr: [254, 64, 7, 180], probeMask: 1, attrValid: true });
     }
@@ -133,7 +115,7 @@ const re_dataSetVisible = async (dataSetList: any, visible: boolean) => {
             re_elemVisible(dataSetId, [elemId], visible);
         } else {
             if (dataSetType !== 0) {
-                let terrId = await NativeBridge.getTerrId({ dataSetId: dataSetId });
+                let terrId = await NativeBridge.getDataSetTerrId({ dataSetId: dataSetId });
                 if (terrId) {
                     let unitNames = await NativeBridge.getAllUnitNames({ dataSetId: dataSetId });
                     let unitId = unitNames[0] ? unitNames[0] : '';
@@ -155,8 +137,43 @@ const re_elemVisible = (dataSetId: any, childNodeIds: any, visible: boolean) => 
     if (visible) {
         NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: childNodeIds });
     } else {
-        NativeBridge.setModelAlpha({ dataSetId: dataSetId, elemIdList: childNodeIds, alpha: 0 });
+        NativeBridge.setElemAlpha({ dataSetId: dataSetId, elemIdList: childNodeIds, alpha: 0 });
     }
+};
+
+// MARK Engine 查看房间
+const re_showRoom = async (roomInfo: any) => {
+    let dataSetId = state_store.sceneId;
+    if (!roomInfo.levelHeightTop) {
+        // 重置所有构件颜色，防止切换房间时，上次选中的房间颜色依旧存在
+        NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: [] });
+        let visibleElements = await NativeBridge.getDataSetAllElemIDs({ dataSetId: dataSetId, visibalOnly: true });
+        NativeBridge.setElemAlpha({ dataSetId: dataSetId, elemIdList: visibleElements, alpha: 30 });
+        NativeBridge.delAllSelElems();
+        NativeBridge.setElemAttr({ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds, elemClr: [255, 0, 0, 255] });
+        let locIDList = [{ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds }];
+        NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 2.0, locType: 'CAM_DIR_CURRENT' });
+    } else {
+        let deltaHeight = roomInfo.levelHeightTop - roomInfo.levelHeightBottom;
+        deltaHeight = Number((deltaHeight * 0.6).toFixed(2));
+        let bottomHeight = Number(Number(roomInfo.levelHeightBottom).toFixed(2));
+
+        NativeBridge.setClipPlanesContourLineClr({ lineClr: [254, 255, 255, 0] });
+        NativeBridge.setClipSpecifyHeight({ dataSetId: dataSetId, topHeight: bottomHeight + deltaHeight, bottomHeight: bottomHeight, single: true });
+        // 重置所有构件颜色，防止切换房间时，上次选中的房间颜色依旧存在
+        NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: [] });
+        let locIDList = [{ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds }];
+        NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 1.0, locType: 'CAM_DIR_TOP' });
+        NativeBridge.setElemAttr({ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds, elemClr: [254, 64, 7, 255] });
+        NativeBridge.setElemDepthBias({ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds, depthBias: -0.00002 });
+    }
+};
+
+// MARK Engine 重置查看房间效果
+const re_resetRoom = () => {
+    let dataSetId = state_store.sceneId;
+    NativeBridge.endClip();
+    NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: [] });
 };
 
 // MARK Data 合并包围盒
@@ -165,17 +182,17 @@ const handle_mergeBBox = async (dataSetList: any) => {
     let yValue: any = [];
     let zValue: any = [];
 
-    dataSetList.forEach((item: any) => {
+    for (const item of dataSetList) {
         let bbox;
         if (item.dataSetType === 0) {
-            bbox = NativeBridge.getBIMDataSetBV({ dataSetId: item.dataSetId });
+            bbox = await NativeBridge.getBIMDataSetBV({ dataSetId: item.dataSetId });
         } else {
-            bbox = NativeBridge.getGridDataSetBV({ dataSetId: item.dataSetId });
+            bbox = await NativeBridge.getGridDataSetBV({ dataSetId: item.dataSetId });
         }
-        xValue.push(bbox[0], bbox[1]);
-        yValue.push(bbox[2], bbox[3]);
-        zValue.push(bbox[4], bbox[5]);
-    });
+        xValue.push(bbox[0][0], bbox[1][0]);
+        yValue.push(bbox[0][1], bbox[1][1]);
+        zValue.push(bbox[0][2], bbox[1][2]);
+    }
 
     let totalBBox = [
         [Math.min(...xValue), Math.min(...yValue), Math.min(...zValue)],

@@ -1,6 +1,11 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-18 11:30:35
+ * @LastEditTime: 2025-07-24 14:39:20
+-->
+<!--
+ * @Author: Lemon C
+ * @Date: 2025-07-18 11:30:35
  * @LastEditTime: 2025-07-23 09:38:21
 -->
 <template>
@@ -370,7 +375,7 @@ const eltree_nodeClick = (nodeData: any, node: any) => {
         if (handle_isEntityNode(nodeData)) {
             engine_camToEntity(allDataSets);
         } else {
-            engine_camToDataSet(allDataSets, nodeData.nodeType);
+            engine_camToDataSet(allDataSets);
         }
         return;
     }
@@ -378,7 +383,7 @@ const eltree_nodeClick = (nodeData: any, node: any) => {
         if (nodeData.dataSetType === 19) {
             engine_camToEntity([nodeData]);
         } else {
-            engine_camToDataSet([nodeData], nodeData.nodeType);
+            engine_camToDataSet([nodeData]);
         }
         return;
     }
@@ -394,7 +399,7 @@ const eltree_nodeClick = (nodeData: any, node: any) => {
                 let dataSetId = nodeData.dataSetId;
                 // let dataSetId = nodeData.dataSetId.replace(/-/g, '');
                 let dataSets = [{ dataSetId, elemIds: childNodeIds }];
-                props.camToElem?.(dataSets, true, true);
+                engine_camToElem(dataSets);
             }
         });
     } else {
@@ -406,7 +411,7 @@ const eltree_nodeClick = (nodeData: any, node: any) => {
                 let dataSetId = nodeData.dataSetId;
                 // let dataSetId = nodeData.dataSetId.replace(/-/g, '');
                 let dataSets = [{ dataSetId, elemIds: childNodeIds }];
-                props.camToElem?.(dataSets, true, true);
+                engine_camToElem(dataSets);
             }
         });
     }
@@ -506,7 +511,7 @@ const eltree_check = (nodeData: any) => {
             REService.getSharedProjectTreeChildren(params).then((res: any) => {
                 let childNodeIds = res[0].childNodeIds;
                 if (childNodeIds.length) {
-                    let dataSetId = nodeData.dataSetId
+                    let dataSetId = nodeData.dataSetId;
                     // let dataSetId = nodeData.dataSetId.replace(/-/g, '');
                     props.elemVisible?.(dataSetId, childNodeIds, nodeObject.checked);
                 }
@@ -591,18 +596,13 @@ const engine_camToEntity = (allDataSets: any) => {
         item.dataSetId = item.dataSetId;
         // item.dataSetId = item.dataSetId.replace(/-/g, '');
     });
-    props.camToElem?.(dataSets, true, true);
+    engine_camToElem(dataSets);
 };
 
 // MARK Engine 定位数据集
-const engine_camToDataSet = (allDataSets: any, nodeType: any) => {
+const engine_camToDataSet = (allDataSets: any) => {
     allDataSets = allDataSets.filter((el: any) => el.viewStatus !== 2);
     if (!allDataSets.length) {
-        // if (nodeType !== 2) {
-        //     this.$message.warning('当前节点下不存在有效的数据集，无法定位');
-        // } else {
-        //     this.$message.warning('当前数据集已失效，无法定位');
-        // }
         return;
     }
 
@@ -612,7 +612,39 @@ const engine_camToDataSet = (allDataSets: any, nodeType: any) => {
         let obj = { dataSetId, dataSetType };
         return obj;
     });
-    props.camToDataSet?.(dataSets);
+
+    const terrainType = [10, 13, 21, 22];
+    let locType = 'CAM_DIR_DEFAULT';
+    if (dataSets.length === 1) {
+        let dataSetInfo = dataSets[0];
+        if (terrainType.includes(dataSetInfo.dataSetType)) {
+            locType = 'CAM_DIR_TOP';
+        } else {
+            locType = 'CAM_DIR_TOPRIGHTBACK';
+        }
+    } else {
+        let isIncludesTerrainType = dataSets.some((el: any) => terrainType.includes(el.dataSetType));
+        if (isIncludesTerrainType) {
+            locType = 'CAM_DIR_TOP';
+        } else {
+            locType = 'CAM_DIR_TOPRIGHTBACK';
+        }
+    }
+
+    props.camToDataSet?.(dataSets, locType);
+};
+
+// MARK Engine 定位构件
+const engine_camToElem = (dataSetList: any) => {
+    let locIDList: any = [];
+    dataSetList.forEach((item: any) => {
+        let obj = {
+            dataSetId: item.dataSetId,
+            elemIdList: item.elemIds,
+        };
+        locIDList.push(obj);
+    });
+    props.camToElem?.(locIDList, 'CAM_DIR_TOPRIGHTBACK', true);
 };
 
 // MARK Engine 水面显示隐藏
