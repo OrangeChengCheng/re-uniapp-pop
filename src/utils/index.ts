@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-07-22 12:25:21
+ * @LastEditTime: 2025-07-24 16:38:56
  */
 import config from './config'
 import reApi from './reApi'
@@ -18,6 +18,10 @@ export default {
             getSharedProjectTreeSubNodes: serviceApi.getSharedProjectTreeSubNodes,
             getSharedProjectTreeChildrenByLazy: serviceApi.getSharedProjectTreeChildrenByLazy,
             getSharedProjectTreeChildren: serviceApi.getSharedProjectTreeChildren,
+            isSharedRoomExistService: serviceApi.isSharedRoomExistService,
+            getSharedRoomList: serviceApi.getSharedRoomList,
+            getSharedRoomElement: serviceApi.getSharedRoomElement,
+            getSharedRoomInfo: serviceApi.getSharedRoomInfo,
         };
 
         (window as any).$reapi = {
@@ -28,28 +32,33 @@ export default {
             webInit: reApi.webInit,
             cloose: reApi.cloose,
             popWebFull: reApi.popWebFull,
-            setModelAlpha: reApi.setModelAlpha,
-            setModelVisible: reApi.setModelVisible,
-            locDataSet: reApi.locDataSet,
-            setCamLocTo: reApi.setCamLocTo,
-            setCamLocToBound: reApi.setCamLocToBound,
-            getCamLocInfo: reApi.getCamLocInfo,
-            locElem: reApi.locElem,
-            setModelColor: reApi.setModelColor,
+            setElemAlpha: reApi.setElemAlpha,
+            setElemsValidState: reApi.setElemsValidState,
+            setCamLocateToDataSet: reApi.setCamLocateToDataSet,
+            setCamLocateTo: reApi.setCamLocateTo,
+            setCamLocateToBound: reApi.setCamLocateToBound,
+            getCamLocate: reApi.getCamLocate,
+            setCamLocateToElem: reApi.setCamLocateToElem,
+            setElemAttr: reApi.setElemAttr,
             resetElemAttr: reApi.resetElemAttr,
             delAllSelElems: reApi.delAllSelElems,
-            addToSel: reApi.addToSel,
+            addToSelElems: reApi.addToSelElems,
             setSelElemsAttr: reApi.setSelElemsAttr,
             setCamLocToWater: reApi.setCamLocToWater,
             setCamLocToExtrude: reApi.setCamLocToExtrude,
             getBIMDataSetBV: reApi.getBIMDataSetBV,
             getGridDataSetBV: reApi.getGridDataSetBV,
-            getTerrId: reApi.getTerrId,
+            getDataSetTerrId: reApi.getDataSetTerrId,
             getAllUnitNames: reApi.getAllUnitNames,
             waterVisible: reApi.waterVisible,
             extrudeVisible: reApi.extrudeVisible,
             setUnitActive: reApi.setUnitActive,
             setGridValidState: reApi.setGridValidState,
+            getDataSetAllElemIDs: reApi.getDataSetAllElemIDs,
+            setElemDepthBias: reApi.setElemDepthBias,
+            setClipPlanesContourLineClr: reApi.setClipPlanesContourLineClr,
+            setClipSpecifyHeight: reApi.setClipSpecifyHeight,
+            endClip: reApi.endClip,
         };
         (window as any).$tool = {
             url_handle: tool.url_handle,

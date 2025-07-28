@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-04-19 12:22:25
- * @LastEditTime: 2025-07-22 14:35:00
+ * @LastEditTime: 2025-07-24 16:35:53
  */
 import { requestPost, requestGet } from '@/service/request';
 
@@ -39,6 +39,26 @@ export function getSharedProjectTreeChildrenByLazy(data: any) {
 // 请求模型目录树下的构件ID
 export function getSharedProjectTreeChildren(data: any) {
     return requestPost('/element/v3/getTreeChildren', data);
+}
+
+// 是否具有空间信息
+export function isSharedRoomExistService(data: any) {
+    return requestPost('/engine/v3/room/exists', data);
+}
+
+// 获取空间信息
+export function getSharedRoomList(data: any) {
+    return requestPost('/engine/v3/room/list', data);
+}
+
+// 获取房间构件
+export function getSharedRoomElement(data: any) {
+    return requestPost('/element/v3/getRoomTreeChildren', data);
+}
+
+// 获取房间信息
+export function getSharedRoomInfo(data: any) {
+    return requestPost('/engine/v3/room/element/parameter/list', data);
 }
 
 

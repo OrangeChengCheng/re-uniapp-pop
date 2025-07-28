@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-22 19:43:43
+ * @LastEditTime: 2025-07-28 10:49:48
  */
 
 import { useStateStore } from '@/stores/state';
@@ -27,28 +27,33 @@ interface ApiMethods {
     webInit(): void;
     cloose(): void;
     popWebFull(data: any): void;
-    setModelAlpha(data: any): void;
-    setModelVisible(data: any): void;
-    locDataSet(data: any): void;
-    setCamLocTo(data: any): void;
-    setCamLocToBound(data: any): void;
-    getCamLocInfo(): void;
-    locElem(data: any): void;
-    setModelColor(data: any): void;
+    setElemAlpha(data: any): void;
+    setElemsValidState(data: any): void;
+    setCamLocateToDataSet(data: any): void;
+    setCamLocateTo(data: any): void;
+    setCamLocateToBound(data: any): void;
+    getCamLocate(): Promise<any>;
+    setCamLocateToElem(data: any): void;
+    setElemAttr(data: any): void;
     resetElemAttr(data: any): void;
     delAllSelElems(): void;
-    addToSel(data: any): void;
+    addToSelElems(data: any): void;
     setSelElemsAttr(data: any): void;
     setCamLocToWater(data: any): void;
     setCamLocToExtrude(data: any): void;
     getBIMDataSetBV(data: any): Promise<any>;
     getGridDataSetBV(data: any): Promise<any>;
-    getTerrId(data: any): Promise<any>;
+    getDataSetTerrId(data: any): Promise<any>;
     getAllUnitNames(data: any): Promise<any>;
     waterVisible(data: any): void;
     extrudeVisible(data: any): void;
     setUnitActive(data: any): void;
     setGridValidState(data: any): void;
+    getDataSetAllElemIDs(data: any): Promise<any>;
+    setElemDepthBias(data: any): void;
+    setClipPlanesContourLineClr(data: any): void;
+    setClipSpecifyHeight(data: any): void;
+    endClip(): void;
 }
 
 const api: ApiMethods = {
@@ -188,43 +193,47 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 设置模型构件透明度
-    setModelAlpha: (data: any): void => {
-        api.sendMsgWebToApp('setModelAlpha', data);
+    setElemAlpha: (data: any): void => {
+        api.sendMsgWebToApp('setElemAlpha', data);
     },
 
     // MARK re-api 设置模型构件显隐
-    setModelVisible: (data: any): void => {
-        api.sendMsgWebToApp('setModelVisible', data);
+    setElemsValidState: (data: any): void => {
+        api.sendMsgWebToApp('setElemsValidState', data);
     },
 
     // MARK re-api 相机定位数据集
-    locDataSet: (data: any): void => {
-        api.sendMsgWebToApp('locDataSet', data);
+    setCamLocateToDataSet: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocateToDataSet', data);
     },
 
     // MARK re-api 相机定位目标
-    setCamLocTo: (data: any): void => {
-        api.sendMsgWebToApp('setCamLocTo', data);
+    setCamLocateTo: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocateTo', data);
     },
 
     // MARK re-api 相机定位包围盒
-    setCamLocToBound: (data: any): void => {
-        api.sendMsgWebToApp('setCamLocToBound', data);
+    setCamLocateToBound: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocateToBound', data);
     },
 
     // MARK re-api 获取相机信息
-    getCamLocInfo: (): void => {
-        api.sendMsgWebToApp('getCamLocInfo');
+    getCamLocate: (): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getCamLocate', null, (response: any) => {
+                resolve(response);
+            });
+        });
     },
 
     // MARK re-api 相机定位模型构件
-    locElem: (data: any): void => {
-        api.sendMsgWebToApp('locElem', data);
+    setCamLocateToElem: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocateToElem', data);
     },
 
     // MARK re-api 设置模型构件颜色
-    setModelColor: (data: any): void => {
-        api.sendMsgWebToApp('setModelColor', data);
+    setElemAttr: (data: any): void => {
+        api.sendMsgWebToApp('setElemAttr', data);
     },
 
     // MARK re-api 重置模型构件颜色
@@ -238,8 +247,8 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 添加到选择集
-    addToSel: (data: any): void => {
-        api.sendMsgWebToApp('addToSel', data);
+    addToSelElems: (data: any): void => {
+        api.sendMsgWebToApp('addToSelElems', data);
     },
 
     // MARK re-api 设置选择集属性
@@ -276,9 +285,9 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 获取全局地形实例标识
-    getTerrId: (data: any): Promise<any> => {
+    getDataSetTerrId: (data: any): Promise<any> => {
         return new Promise((resolve) => {
-            api.sendMsgWebToApp('getTerrId', data, (response: any) => {
+            api.sendMsgWebToApp('getDataSetTerrId', data, (response: any) => {
                 resolve(response);
             });
         });
@@ -311,6 +320,35 @@ const api: ApiMethods = {
     // MARK re-api 挤出显隐
     extrudeVisible: (data: any): void => {
         api.sendMsgWebToApp('extrudeVisible', data);
+    },
+
+    // MARK re-api 获取某一个数据集的可见的元素id集合
+    getDataSetAllElemIDs: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getDataSetAllElemIDs', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+    // MARK re-api 设置模型的深度偏移值
+    setElemDepthBias: (data: any): void => {
+        api.sendMsgWebToApp('setElemDepthBias', data);
+    },
+
+    // MARK re-api 设置剖切面与模型相交的轮廓线颜色
+    setClipPlanesContourLineClr: (data: any): void => {
+        api.sendMsgWebToApp('setClipPlanesContourLineClr', data);
+    },
+
+    // MARK re-api 根据指定高度进行单双面剖切
+    setClipSpecifyHeight: (data: any): void => {
+        api.sendMsgWebToApp('setClipSpecifyHeight', data);
+    },
+
+    // MARK re-api 退出剖切状态
+    endClip: (): void => {
+        api.sendMsgWebToApp('endClip');
     },
 
 }
