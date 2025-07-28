@@ -3,6 +3,7 @@
         <el-tabs v-if="roomExist" v-model="activeName" type="card" class="eltabs-area" @tab-click="eltabs_tabChilck">
             <el-tab-pane label="构件" name="elem">
                 <elem-comp
+                    ref="ref_elem_comp"
                     :sceneId="sceneId"
                     :elem_treeList="elem_treeList"
                     :camToElem="camToElem"
@@ -20,7 +21,8 @@
 
 // MOD-- JavaScript
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ElTree } from 'element-plus';
+import { ref, onMounted, nextTick } from 'vue';
 import ElemComp from './ElemComp.vue';
 import RoomComp from './RoomComp.vue';
 import type { TabsPaneContext } from 'element-plus';
@@ -37,6 +39,7 @@ const props = defineProps({
     resetRoom: Function,
 });
 
+const ref_elem_comp = ref<InstanceType<typeof ElemComp> | null>(null);
 const formatType = ref(1);
 const activeName = ref('elem');
 const roomExist = ref(false);
@@ -161,11 +164,17 @@ const handle_getRoomName = () => {
     return roomFilesName;
 };
 
-
 // MARK eltabs tab切换
 const eltabs_tabChilck = (tab: TabsPaneContext, event: Event) => {
     if (tab.props.name == 'elem') {
         props.resetRoom?.();
+        nextTick(() => {
+            if (ref_elem_comp.value && ref_elem_comp.value.ref_eltree) {
+                // 使用类型断言确保类型安全
+                const eltree = ref_elem_comp.value.ref_eltree as InstanceType<typeof ElTree>;
+                eltree.setCheckedKeys([elem_treeList.value[0].uniqueId]);
+            }
+        });
     }
 };
 </script>

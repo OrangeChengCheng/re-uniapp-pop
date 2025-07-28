@@ -48,6 +48,11 @@ const defaultProps = {
     label: 'name',
 };
 
+// 暴露方法给父组件
+defineExpose({
+    ref_eltree,
+});
+
 watch(
     () => props.elem_treeList,
     () => {
