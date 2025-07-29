@@ -1,10 +1,10 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2025-07-28 17:04:46
+ * @LastEditTime: 2025-07-29 09:43:12
 -->
 <template>
-    <transition name="slide-up-down" @after-leave="tran_after_leave">
+    <transition name="slide-up-down" :class="{ 'disable-transition': disableTransition }" @after-leave="tran_after_leave">
         <div v-show="popViewShow" class="sup-base-view">
             <div class="cloose-area" @click="cloose_click">
                 <div class="cloose-line"></div>
@@ -27,6 +27,8 @@ const props = defineProps({
 const NativeBridge = (window as any).$reapi;
 
 const popViewShow = ref(false);
+const disableTransition = ref(false); //控制是否禁用过渡动画的开关
+const isFullScreen = ref(false);
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handle_appToWebMsg);
@@ -53,7 +55,9 @@ const handle_appToWebMsg = (msgData: any) => {
 
 // MARK transition 监听动画完成
 const tran_after_leave = () => {
-    NativeBridge.cloose();
+    if (!isFullScreen.value) {
+        NativeBridge.cloose();
+    }
 };
 
 // MARK 打开视图并触发动画
@@ -65,6 +69,23 @@ const openView = () => {
 const cloose_click = () => {
     popViewShow.value = false;
 };
+
+// MARK 全屏
+const fullScreen = () => {
+    isFullScreen.value = true;
+    disableTransition.value = true;
+    cloose_click();
+    setTimeout(() => {
+        disableTransition.value = false;
+        openView();
+        isFullScreen.value = false;
+    }, 100);
+};
+
+// MARK 暴露方法给父组件
+defineExpose({
+    fullScreen,
+});
 </script>
 
 // MOD-- CSS
@@ -97,6 +118,10 @@ const cloose_click = () => {
 .slide-up-down-enter-to,
 .slide-up-down-leave-from {
     transform: translateY(0);
+}
+
+.disable-transition {
+    transition: none !important; /* 强制取消过渡 */
 }
 
 .cloose-area {

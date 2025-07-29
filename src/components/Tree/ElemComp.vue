@@ -48,10 +48,7 @@ const defaultProps = {
     label: 'name',
 };
 
-// 暴露方法给父组件
-defineExpose({
-    ref_eltree,
-});
+
 
 watch(
     () => props.elem_treeList,
@@ -330,6 +327,12 @@ const engine_dataSetVisible = (dataSetType: any, visible: boolean) => {
 const engine_elemVisible = (elemIdList: any, visible: boolean) => {
     props.elemVisible?.(props.sceneId, elemIdList, visible);
 };
+
+
+// MARK 暴露方法给父组件
+defineExpose({
+    ref_eltree,
+});
 </script>
 
 // MOD-- CSS

@@ -1,7 +1,6 @@
 <template>
-    <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
+    <base-view ref="ref_base_view" :base_appTpWebMsg_callback="handle_appToWebMsg">
         <div class="cad-container">
-            <button @click="sendMessageToMobileCloose()">关闭【图纸弹窗】</button>
             <div>Web 与 移动端 通信示例</div>
             <div class="message"><strong>接收【初始化消息】:</strong> {{ initAppToWebMsg }}</div>
             <div class="message"><strong>接收【发送消息】:</strong> {{ mobileMessage }}</div>
@@ -27,6 +26,7 @@ import BaseView from '@/components/Base/BaseView.vue';
 
 const NativeBridge = (window as any).$reapi;
 
+const ref_base_view = ref<InstanceType<typeof BaseView> | null>(null);
 const initAppToWebMsg = ref('');
 const mobileMessage = ref('');
 const modelVisible = ref(true);
@@ -43,13 +43,11 @@ const handle_appToWebMsg = (message: any) => {
     mobileMessage.value = message;
 };
 
-const sendMessageToMobileCloose = () => {
-    NativeBridge.cloose();
-};
 
 const click_showCad = () => {
     isShowCad.value = !isShowCad.value;
     NativeBridge.popWebFull(isShowCad.value);
+    ref_base_view.value?.fullScreen();
 };
 
 const setElemAttr = () => {
