@@ -32,9 +32,7 @@ const mobileMessage = ref('');
 const modelVisible = ref(true);
 const isShowCad = ref(false);
 
-onMounted(() => {
-    
-});
+onMounted(() => {});
 
 // 处理从 移动端 接收的消息
 const handle_appToWebMsg = (message: any) => {
@@ -43,10 +41,9 @@ const handle_appToWebMsg = (message: any) => {
     mobileMessage.value = message;
 };
 
-
 const click_showCad = () => {
     isShowCad.value = !isShowCad.value;
-    NativeBridge.popWebFull(isShowCad.value);
+    NativeBridge.popWebFull({ full: isShowCad.value });
     ref_base_view.value?.fullScreen();
 };
 

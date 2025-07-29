@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2025-07-29 09:43:12
+ * @LastEditTime: 2025-07-29 16:45:46
 -->
 <template>
     <transition name="slide-up-down" :class="{ 'disable-transition': disableTransition }" @after-leave="tran_after_leave">
@@ -29,9 +29,11 @@ const NativeBridge = (window as any).$reapi;
 const popViewShow = ref(false);
 const disableTransition = ref(false); //控制是否禁用过渡动画的开关
 const isFullScreen = ref(false);
+const currWebPopId = ref('');
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handle_appToWebMsg);
+    openView();//TODO
 });
 
 // MARK App->Web 接收App消息
@@ -46,7 +48,8 @@ const handle_appToWebMsg = (msgData: any) => {
 
             if (appData.type === 'open') {
                 openView();
-            } else if (appData.type === 'close') {
+                currWebPopId.value = appData.data.webPopId;
+            } else if (appData.type === 'cloose') {
                 cloose_click();
             }
         }
@@ -56,7 +59,7 @@ const handle_appToWebMsg = (msgData: any) => {
 // MARK transition 监听动画完成
 const tran_after_leave = () => {
     if (!isFullScreen.value) {
-        NativeBridge.cloose();
+        NativeBridge.cloose({ webPopId: currWebPopId.value });
     }
 };
 

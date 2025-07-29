@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-28 10:49:48
+ * @LastEditTime: 2025-07-29 16:30:18
  */
 
 import { useStateStore } from '@/stores/state';
@@ -25,7 +25,7 @@ interface ApiMethods {
     sendMsgWebToApp(type: string, data?: any, callback?: Function): void;
     getInitUrlParam(): any;
     webInit(): void;
-    cloose(): void;
+    cloose(data: any): void;
     popWebFull(data: any): void;
     setElemAlpha(data: any): void;
     setElemsValidState(data: any): void;
@@ -180,16 +180,13 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 关闭窗口
-    cloose: (): void => {
-        api.sendMsgWebToApp("cloose");
+    cloose: (data: any): void => {
+        api.sendMsgWebToApp("cloose", data);
     },
 
     // MARK re-api 关闭窗口
     popWebFull: (data: any): void => {
-        let sendData: any = {
-            full: data
-        };
-        api.sendMsgWebToApp("popWebFull", sendData);
+        api.sendMsgWebToApp("popWebFull", data);
     },
 
     // MARK re-api 设置模型构件透明度
