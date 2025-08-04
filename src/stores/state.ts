@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2025-07-18 12:02:02
+ * @LastEditTime: 2025-08-04 17:35:22
  */
 import { defineStore } from 'pinia'
 
@@ -23,6 +23,7 @@ import { defineStore } from 'pinia'
 */
 
 interface StateMold {
+    pcDebug: boolean,
     baseUrl: string,
     token: string,
     shareType: number,
@@ -32,6 +33,7 @@ interface StateMold {
 
 export const useStateStore = defineStore('state', {
     state: (): StateMold => ({
+        pcDebug: false,// pc端调试
         baseUrl: "",// app当前服务配置
         token: "",// app当前token
         shareType: 0,// 0：无 1：模型 2：场景

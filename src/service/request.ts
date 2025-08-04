@@ -1,14 +1,14 @@
 /*
  * @Author: Lemon C
  * @Date: 2022-11-08 11:58:14
- * @LastEditTime: 2025-07-22 14:37:21
+ * @LastEditTime: 2025-08-04 17:34:12
  */
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { useStateStore } from '@/stores/state';
 
 
 const RE_ServerURl = "https://engine3.bjblackhole.com";
-
+const RE_ServerRoute = "App3D";
 
 
 // 创建axios实例, 这里静态创建不填写动态值
@@ -75,7 +75,7 @@ export function requestPost(url: string, data?: object): Promise<any> {
             return;
         }
 
-        service.post(`/blackHole3D/project${url}`, data)
+        service.post(`/${RE_ServerRoute}/project${url}`, data)
             .then((response) => {
                 let resData = response.data;
                 if (resData.data && resData.data === '{}') {
@@ -99,7 +99,7 @@ export function requestGet(url: string, data?: object): Promise<any> {
             return;
         }
 
-        service.get(`/blackHole3D/project${url}`, { params: data })
+        service.get(`/${RE_ServerRoute}/project${url}`, { params: data })
             .then((response) => {
                 let resData = response.data;
                 if (resData.data && resData.data === '{}') {

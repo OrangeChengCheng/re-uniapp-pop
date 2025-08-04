@@ -19,6 +19,9 @@
 // MOD-- JavaScript
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useStateStore } from '@/stores/state';
+
+const state_store = useStateStore();
 
 const props = defineProps({
     base_appTpWebMsg_callback: Function,
@@ -33,7 +36,9 @@ const currWebPopId = ref('');
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handle_appToWebMsg);
-    openView();//TODO
+    if (state_store.pcDebug) {
+        openView();
+    }
 });
 
 // MARK App->Web 接收App消息
