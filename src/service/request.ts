@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2022-11-08 11:58:14
- * @LastEditTime: 2025-08-04 17:34:12
+ * @LastEditTime: 2025-08-05 14:23:46
  */
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { useStateStore } from '@/stores/state';
@@ -24,6 +24,7 @@ service.interceptors.request.use((config: any) => {
 
     config.headers = config.headers || {};
     config.headers.Authorization = token;
+    config.headers.App3D = true;
     return config;
 });
 
