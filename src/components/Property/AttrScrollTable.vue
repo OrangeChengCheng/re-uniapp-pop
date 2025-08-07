@@ -1,12 +1,12 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-14 15:46:06
- * @LastEditTime: 2025-07-17 17:38:10
+ * @LastEditTime: 2025-08-07 10:09:47
 -->
 <template>
     <div class="property-model-area">
         <el-scrollbar v-if="attr_list.length">
-            <el-collapse :value="collapseItems" :expand-icon-position="'left'">
+            <el-collapse v-model="activeNames" :expand-icon-position="'left'">
                 <el-collapse-item :name="item.paramGroup" :title="item.paramGroup" v-for="(item, index) in attr_list" :key="index">
                     <attr-table :table_list="item.paramDatas"></attr-table>
                 </el-collapse-item>
@@ -28,22 +28,22 @@ const props = defineProps({
     },
 });
 
-const collapseItems = ref<number[]>([]);
+const activeNames = ref<any[]>([]);
 
 watch(
     () => props.attr_list,
     () => {
-        collapseItems.value = [];
+        activeNames.value = [];
         props.attr_list.forEach((item: any, index: number) => {
-            collapseItems.value.push(index);
+            activeNames.value.push(item.paramGroup);
         });
     }
 );
 
 onMounted(() => {
-    collapseItems.value = [];
+    activeNames.value = [];
     props.attr_list.forEach((item: any, index: number) => {
-        collapseItems.value.push(index);
+        activeNames.value.push(item.paramGroup);
     });
 });
 </script>

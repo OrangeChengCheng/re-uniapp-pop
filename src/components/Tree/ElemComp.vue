@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-23 15:15:48
- * @LastEditTime: 2025-07-24 15:12:23
+ * @LastEditTime: 2025-08-06 16:02:35
 -->
 <template>
     <div class="sup-elem-comp">
@@ -76,7 +76,7 @@ const data_update = () => {
 // MARK service 获取目录树字节点
 const service_getTreeSubNodes = (nodeData: any, node: any) => {
     let params = {
-        dataSetId: nodeData.dataSetId,
+        dataSetId: props.sceneId,
         fileIntId: nodeData.fileIntId,
         uniqueId: nodeData.uniqueId,
     };
@@ -97,9 +97,9 @@ const service_getTreeSubNodes = (nodeData: any, node: any) => {
 // MARK service 获取目录树字节点-懒加载
 const service_getTreeSubNodesByLazy = (nodeData: any, node: any) => {
     let params = {
-        dataSetId: nodeData.dataSetId,
-        parentNodeIntId: nodeData.nodeIntId ? Number(nodeData.nodeIntId) : Number(nodeData.fileUniqueId),
-        hostFileId: Number(nodeData.fileUniqueId),
+        dataSetId: props.sceneId,
+        parentNodeIntId: nodeData.nodeIntId ? Number(nodeData.nodeIntId) : Number(nodeData.fileIntId),
+        hostFileId: Number(nodeData.fileIntId),
     };
     REService.getSharedProjectTreeSubNodesByLazy(params).then((res: any) => {
         nodeData.nodes = res.map((item: any) => {

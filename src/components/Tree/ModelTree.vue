@@ -15,7 +15,14 @@
                 <room-comp :sceneId="sceneId" :room_treeList="room_treeList" :showRoom="showRoom"></room-comp>
             </el-tab-pane>
         </el-tabs>
-        <elem-comp v-else :sceneId="sceneId" :elem_treeList="elem_treeList"></elem-comp>
+        <elem-comp
+            v-else
+            :sceneId="sceneId"
+            :elem_treeList="elem_treeList"
+            :camToElem="camToElem"
+            :camToDataSet="camToDataSet"
+            :dataSetVisible="dataSetVisible"
+            :elemVisible="elemVisible"></elem-comp>
     </div>
 </template>
 

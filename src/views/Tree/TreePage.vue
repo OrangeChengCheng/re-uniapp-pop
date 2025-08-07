@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-07-28 16:42:03
+ * @LastEditTime: 2025-08-07 10:18:31
 -->
 <template>
     <base-view>
@@ -65,17 +65,17 @@ const re_camToDataSet = async (dataSetList: any, locType: string) => {
     if (dataSetList.length === 1) {
         let dataSetInfo = dataSetList[0];
         let dataSetId = dataSetInfo.dataSetId;
-        NativeBridge.setCamLocateToDataSet({ dataSetId: dataSetId, backDepth: 1.0, locType: locType });
+        NativeBridge.setCamLocateToDataSet({ dataSetId: dataSetId, backDepth: 2.0, locType: locType });
     } else {
         let bbox = await handle_mergeBBox(dataSetList);
-        NativeBridge.setCamLocateToBound({ arrBound: bbox, backDepth: 1.0, locType: locType });
+        NativeBridge.setCamLocateToBound({ arrBound: bbox, backDepth: 2.0, locType: locType });
     }
 };
 
 // MARK Engine 定位单构件
 const re_camToElem = (locIDList: any, locType: string, isHighLight: boolean) => {
     NativeBridge.delAllSelElems();
-    NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 1.0, locType: locType });
+    NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 2.0, locType: locType });
 
     if (isHighLight) {
         locIDList.forEach((item: any) => {
@@ -158,7 +158,7 @@ const re_showRoom = async (roomInfo: any) => {
         // 重置所有构件颜色，防止切换房间时，上次选中的房间颜色依旧存在
         NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: [] });
         let locIDList = [{ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds }];
-        NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 1.0, locType: 'CAM_DIR_TOP' });
+        NativeBridge.setCamLocateToElem({ locIDList: locIDList, backDepth: 2.0, locType: 'CAM_DIR_TOP' });
         NativeBridge.setElemAttr({ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds, elemClr: [254, 64, 7, 255] });
         NativeBridge.setElemDepthBias({ dataSetId: dataSetId, elemIdList: roomInfo.elemIntIds, depthBias: -0.00002 });
     }
