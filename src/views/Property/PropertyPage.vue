@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-07 14:58:27
- * @LastEditTime: 2025-07-28 17:09:16
+ * @LastEditTime: 2025-12-11 17:32:12
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -40,7 +40,33 @@ const shpAttrList = ref<any[]>([]);
 const entityAttrTypeList = ref<any[]>([]);
 const entityAttrList = ref<any[]>([]);
 
-onMounted(() => {});
+onMounted(() => {
+    // const msgData = {
+    //     data: {
+    //         dataSetType: 0,
+    //         probeInfo: {
+    //             dataSetId: '3a1e0f8e-f06f-7068-259b-3d8498f7f998',
+    //             elemType: 'BIMElem',
+    //             elemId: 23,
+    //             elemBV: [
+    //                 [-19.009716033935547, -9.669635772705078, 2.438307046890259],
+    //                 [6.417759418487549, 14.551069259643555, 2.495642900466919],
+    //             ],
+    //             elemScrPos: [194, 398],
+    //             elemCenter: [-6.295978307723999, 2.4407167434692383, 2.466974973678589],
+    //             elemPos: [-6.052760597128636, 1.5369548254829368, 2.4955620024442737],
+    //         },
+    //     },
+    //     msgId: '',
+    //     type: 'Probe.getCurCombProbeRet',
+    //     isResponse: false,
+    // };
+    // state_store.updateCurrBaseUrl('http://192.168.31.14:9012');
+    // setTimeout(() => {
+    //     instance?.proxy.$showLoading();
+    //     server_getAttrData(msgData.data);
+    // }, 10000);
+});
 
 // MARK App->Web 接收App消息
 const handle_appToWebMsg = (msgData: any) => {
@@ -85,8 +111,8 @@ const server_getAttrData_model = (re_selModel: any) => {
     };
     getSharedProjectParam(params).then((res) => {
         instance?.proxy.$hideLoading();
-        if (res.isSuccess) {
-            handle_modelData(res.data);
+        if (res) {
+            handle_modelData(res);
         } else {
             modelAttrList_basic.value = [];
             modelAttrList_extend.value = [];
@@ -111,8 +137,8 @@ const server_getAttrData_shp = (re_selModel: any) => {
     let params = { dataSetId: findObj.dataSetId, elemId: shpElemId };
     getSharedVectorParam(params).then((res) => {
         instance?.proxy.$hideLoading();
-        if (res.isSuccess) {
-            handle_shpData(res.data);
+        if (res) {
+            handle_shpData(res);
         } else {
             shpAttrList.value = [];
         }
@@ -150,8 +176,8 @@ const server_getAttrData_entity = async (re_selModel: any) => {
 const server_getAttrData_entity_type = (params: any): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
         getElemParamTypeService(params).then((res) => {
-            if (res.isSuccess) {
-                resolve(res.data);
+            if (res) {
+                resolve(res);
             } else {
                 reject(null);
             }
@@ -164,8 +190,8 @@ const server_getAttrData_entity_info = (params: any): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
         getElemParamService(params).then((res) => {
             instance?.proxy.$hideLoading();
-            if (res.isSuccess) {
-                resolve(res.data);
+            if (res) {
+                resolve(res);
             } else {
                 reject(null);
             }

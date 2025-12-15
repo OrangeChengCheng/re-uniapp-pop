@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2025-08-04 17:35:22
+ * @LastEditTime: 2025-12-11 16:15:08
  */
 import { defineStore } from 'pinia'
 
@@ -28,16 +28,20 @@ interface StateMold {
     token: string,
     shareType: number,
     sceneId: string,
+    webPopId: string,
+    testMsg: string,
 }
 
 
 export const useStateStore = defineStore('state', {
     state: (): StateMold => ({
-        pcDebug: false,// pc端调试
+        pcDebug: true,// pc端调试
         baseUrl: "",// app当前服务配置
         token: "",// app当前token
         shareType: 0,// 0：无 1：模型 2：场景
         sceneId: "",// app当前场景id，shareType=1代表数据集id  shareType=2代表场景id
+        webPopId: "",// 当前web弹窗id
+        testMsg: "",// 测试信息
     }),
     actions: {
 
@@ -59,6 +63,11 @@ export const useStateStore = defineStore('state', {
         // MARK 更新当前的sceneId
         updateCurrSceneId(sceneId: string) {
             this.sceneId = sceneId;
+        },
+
+        // MARK 更新当前的webPopId
+        updateCurrWebPopId(webPopId: string) {
+            this.webPopId = webPopId;
         },
 
     }

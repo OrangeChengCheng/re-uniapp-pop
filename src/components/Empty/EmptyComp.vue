@@ -1,3 +1,8 @@
+<!--
+ * @Author: Lemon C
+ * @Date: 2025-07-17 16:45:11
+ * @LastEditTime: 2025-12-11 15:09:42
+-->
 <template>
     <div class="sup-empty-comp">
         <div class="empty-img-area">
@@ -33,7 +38,14 @@ const props = defineProps({
 
     .empty-img-area {
         position: relative;
+        max-width: 200px;
+        max-height: 100px;
         margin-top: -50px;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
     }
 }
 </style>

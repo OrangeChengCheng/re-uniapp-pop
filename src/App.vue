@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-02 11:25:16
- * @LastEditTime: 2025-07-18 10:19:26
+ * @LastEditTime: 2025-12-11 11:11:27
 -->
 <template>
     <router-view />
@@ -14,8 +14,8 @@ import { ref, onMounted } from 'vue';
 const NativeBridge = (window as any).$reapi;
 
 onMounted(() => {
-    NativeBridge.webInit();
     NativeBridge.getInitUrlParam();
+    NativeBridge.webInit();
 });
 </script>
 

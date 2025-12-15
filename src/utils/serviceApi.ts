@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2025-07-21 10:25:29
- * @LastEditTime: 2025-07-24 16:38:14
+ * @LastEditTime: 2025-12-11 17:30:57
  */
 import {
     getSharedProjectSceneTree,
@@ -34,9 +34,7 @@ const api: ApiMethods = {
     getSharedProjectSceneTree: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedProjectSceneTree(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -45,9 +43,7 @@ const api: ApiMethods = {
     getSharedProjectTree: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedProjectTree(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -56,9 +52,7 @@ const api: ApiMethods = {
     getSharedProjectTreeSubNodesByLazy: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedProjectTreeSubNodesByLazy(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -67,9 +61,7 @@ const api: ApiMethods = {
     getSharedProjectTreeSubNodes: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedProjectTreeSubNodes(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -78,9 +70,7 @@ const api: ApiMethods = {
     getSharedProjectTreeChildrenByLazy: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedProjectTreeChildrenByLazy(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -89,9 +79,7 @@ const api: ApiMethods = {
     getSharedProjectTreeChildren: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedProjectTreeChildren(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -100,9 +88,7 @@ const api: ApiMethods = {
     isSharedRoomExistService: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             isSharedRoomExistService(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -111,9 +97,7 @@ const api: ApiMethods = {
     getSharedRoomList: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedRoomList(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -122,9 +106,7 @@ const api: ApiMethods = {
     getSharedRoomElement: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedRoomElement(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },
@@ -133,9 +115,7 @@ const api: ApiMethods = {
     getSharedRoomInfo: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedRoomInfo(paran).then((res) => {
-                if (res.isSuccess) {
-                    resolve(res.data);
-                }
+                resolve(res);
             });
         });
     },

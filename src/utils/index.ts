@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-07-24 16:38:56
+ * @LastEditTime: 2025-12-10 16:27:06
  */
 import config from './config'
 import reApi from './reApi'
@@ -28,6 +28,8 @@ export default {
             isInNativeApp: reApi.isInNativeApp,
             getPlatform: reApi.getPlatform,
             registerAppMsg: reApi.registerAppMsg,
+            requestAppToWeb: reApi.requestAppToWeb,
+            logToApp: reApi.logToApp,
             getInitUrlParam: reApi.getInitUrlParam,
             webInit: reApi.webInit,
             cloose: reApi.cloose,

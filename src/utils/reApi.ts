@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-07-29 16:30:18
+ * @LastEditTime: 2025-12-11 15:24:06
  */
 
 import { useStateStore } from '@/stores/state';
@@ -12,6 +12,7 @@ interface BridgeMsg {
     type: string;           // 操作类型
     data: any;              // 数据
     isResponse?: boolean;   // 是否为响应消息
+    webPopId?: string;      // web弹窗标识
 }
 
 // 存储消息回调的 Map
@@ -23,6 +24,8 @@ interface ApiMethods {
     getPlatform(): string;
     registerAppMsg(callback: Function): void;
     sendMsgWebToApp(type: string, data?: any, callback?: Function): void;
+    requestAppToWeb(data: any): Promise<any>;
+    logToApp(data: any): void;
     getInitUrlParam(): any;
     webInit(): void;
     cloose(data: any): void;
@@ -99,11 +102,13 @@ const api: ApiMethods = {
     // MARK re-api 发送消息到原生应用
     sendMsgWebToApp: (type: string, data?: any, callback?: Function): void => {
         const msgId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+        const state_store = useStateStore();
         const bridgeMsg: BridgeMsg = {
             msgId: msgId,
             type: type,
             data: data ? data : {},
-            isResponse: false
+            isResponse: false,
+            webPopId: state_store.webPopId,
         };
 
         if (callback) {
@@ -133,6 +138,19 @@ const api: ApiMethods = {
         }
     },
 
+    // MARK re-api 由web提供参数，app发起请求获取数据返还web
+    requestAppToWeb: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('requestAppToWeb', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+    logToApp: (data: any): void => {
+        api.sendMsgWebToApp("log", { log: data });
+    },
+
     // MARK re-api 接收初始化参数
     getInitUrlParam: (): any => {
         const fullUrl = window.location.href;
@@ -155,6 +173,9 @@ const api: ApiMethods = {
         //更新基础配置
         const state_store = useStateStore();
         if (result.baseUrl && result.baseUrl.length > 0) {
+            // URL 解码，跳过系统限制的 HTTPS/HTTP 混合
+            // const baseUrl = decodeURIComponent(result.baseUrl);
+            // state_store.updateCurrBaseUrl(baseUrl);
             state_store.updateCurrBaseUrl(result.baseUrl);
         }
 
@@ -168,6 +189,10 @@ const api: ApiMethods = {
 
         if (result.sceneId && result.sceneId.length > 0) {
             state_store.updateCurrSceneId(result.sceneId);
+        }
+
+        if (result.webPopId && result.webPopId.length > 0) {
+            state_store.updateCurrWebPopId(result.webPopId);
         }
 
         console.log('接收到的参数:', JSON.stringify(result));

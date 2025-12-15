@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-11 15:48:00
- * @LastEditTime: 2025-07-17 17:43:21
+ * @LastEditTime: 2025-12-01 12:01:52
 -->
 <template>
     <div class="property-shp-area">
@@ -27,6 +27,7 @@ const props = defineProps({
 .property-shp-area {
     position: relative;
     height: 100%;
+    width: 100%;
     overflow-y: auto;
 
     .attr-table-area {
