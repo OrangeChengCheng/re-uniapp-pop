@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2022-11-08 11:58:14
- * @LastEditTime: 2025-12-15 16:16:20
+ * @LastEditTime: 2025-12-18 15:31:57
  */
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { useStateStore } from '@/stores/state';
@@ -20,12 +20,11 @@ const service: AxiosInstance = axios.create({
 service.interceptors.request.use((config: any) => {
     const state_store = useStateStore();
     let baseUrl = state_store.baseUrl;
-    if (baseUrl.includes("/BlackHole") || baseUrl.includes("/StarRiver")) {
-        baseUrl = baseUrl.replace("/BlackHole", "").replace("/StarRiver", "");
-    }
+    const ignorePathKeywords = ["/BlackHole", "/StarRiver", "/blackHole", "/starRiver"];
+    ignorePathKeywords.forEach((item: string) => baseUrl = baseUrl.replace(item, ""));
     config.baseURL = baseUrl || RE_ServerURl;
     const token = state_store.token || '';
-    
+
     config.headers = config.headers || {};
     config.headers.Authorization = token;
     config.headers.App3D = true;
@@ -85,9 +84,8 @@ function appRequest(type: string, resolve: any, reject: any, url: string, data?:
     const NativeBridge = (window as any).$reapi;
     const state_store = useStateStore();
     let baseUrl = state_store.baseUrl;
-    if (baseUrl.includes("/BlackHole") || baseUrl.includes("/StarRiver")) {
-        baseUrl = baseUrl.replace("/BlackHole", "").replace("/StarRiver", "");
-    }
+    const ignorePathKeywords = ["/BlackHole", "/StarRiver", "/blackHole", "/starRiver"];
+    ignorePathKeywords.forEach((item: string) => baseUrl = baseUrl.replace(item, ""));
     const fullUrl = `${baseUrl || RE_ServerURl}/${RE_ServerRoute}/project${url}`;
     const headers = [
         {
