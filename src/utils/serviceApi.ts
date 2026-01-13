@@ -1,9 +1,10 @@
 /*
  * @Author: Lemon C
  * @Date: 2025-07-21 10:25:29
- * @LastEditTime: 2025-12-11 17:30:57
+ * @LastEditTime: 2025-12-24 10:46:09
  */
 import {
+    getSharedSceneById,
     getSharedProjectSceneTree,
     getSharedProjectTree,
     getSharedProjectTreeSubNodesByLazy,
@@ -14,9 +15,12 @@ import {
     getSharedRoomList,
     getSharedRoomElement,
     getSharedRoomInfo,
+    getSharedBimElemTreeNodesByGroupService,
+    getSharedBimElemIdsByGroupService,
 } from '@/service/interface';
 
 interface ApiMethods {
+    getSharedSceneById(paran: any): Promise<any>;
     getSharedProjectSceneTree(paran: any): Promise<any>;
     getSharedProjectTree(paran: any): Promise<any>;
     getSharedProjectTreeSubNodesByLazy(paran: any): Promise<any>;
@@ -27,9 +31,20 @@ interface ApiMethods {
     getSharedRoomList(paran: any): Promise<any>;
     getSharedRoomElement(paran: any): Promise<any>;
     getSharedRoomInfo(paran: any): Promise<any>;
+    getSharedBimElemTreeNodesByGroupService(paran: any): Promise<any>;
+    getSharedBimElemIdsByGroupService(paran: any): Promise<any>;
 }
 
 const api: ApiMethods = {
+    // MARK 根据场景id查询场景信息
+    getSharedSceneById: (paran: any): Promise<any> => {
+        return new Promise<any>((resolve) => {
+            getSharedSceneById(paran).then((res) => {
+                resolve(res);
+            });
+        });
+    },
+
     // MARK 根据树id查询树
     getSharedProjectSceneTree: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
@@ -115,6 +130,24 @@ const api: ApiMethods = {
     getSharedRoomInfo: (paran: any): Promise<any> => {
         return new Promise<any>((resolve) => {
             getSharedRoomInfo(paran).then((res) => {
+                resolve(res);
+            });
+        });
+    },
+
+    // MARK 根据分组获取目录树子节点
+    getSharedBimElemTreeNodesByGroupService: (paran: any): Promise<any> => {
+        return new Promise<any>((resolve) => {
+            getSharedBimElemTreeNodesByGroupService(paran).then((res) => {
+                resolve(res);
+            });
+        });
+    },
+
+    // MARK 获取RvtGroup节点关联的构件id
+    getSharedBimElemIdsByGroupService: (paran: any): Promise<any> => {
+        return new Promise<any>((resolve) => {
+            getSharedBimElemIdsByGroupService(paran).then((res) => {
                 resolve(res);
             });
         });

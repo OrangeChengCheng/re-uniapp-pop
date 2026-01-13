@@ -9,7 +9,8 @@
                     :camToElem="camToElem"
                     :camToDataSet="camToDataSet"
                     :dataSetVisible="dataSetVisible"
-                    :elemVisible="elemVisible"></elem-comp>
+                    :elemVisible="elemVisible"
+                    :resetElemAttr="resetElemAttr"></elem-comp>
             </el-tab-pane>
             <el-tab-pane label="房间和面积" name="room">
                 <room-comp :sceneId="sceneId" :room_treeList="room_treeList" :showRoom="showRoom"></room-comp>
@@ -22,7 +23,8 @@
             :camToElem="camToElem"
             :camToDataSet="camToDataSet"
             :dataSetVisible="dataSetVisible"
-            :elemVisible="elemVisible"></elem-comp>
+            :elemVisible="elemVisible"
+            :resetElemAttr="resetElemAttr"></elem-comp>
     </div>
 </template>
 
@@ -44,6 +46,7 @@ const props = defineProps({
     elemVisible: Function,
     showRoom: Function,
     resetRoom: Function,
+    resetElemAttr: Function,
 });
 
 const ref_elem_comp = ref<InstanceType<typeof ElemComp> | null>(null);
@@ -131,6 +134,7 @@ const handle_formatDataSetTree = (dataSetList: any) => {
         treeData = dataSetList[0].files;
         treeData.forEach((item: any) => {
             item['customNodeType'] = 'dataSet';
+            item['formatType'] = formatType;
             item['name'] = item.fileName;
             item['dataSetId'] = dataSetList[0].dataSetId;
             item['dataSetType'] = dataSetList[0].dataSetType;

@@ -105,5 +105,7 @@ body {
     --select-poper-label-active-bgcolor: rgba(255, 255, 255, 0.1);
     --select-poper-label-select-bgcolor: rgba(37, 128, 255, 0.1);
     --select-poper-label-select-color: #2580ff;
+
+    --bimview-rvt-group-color: #5a8cea;
 }
 </style>

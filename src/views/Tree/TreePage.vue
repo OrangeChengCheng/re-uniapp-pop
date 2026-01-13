@@ -1,12 +1,13 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-08-07 10:18:31
+ * @LastEditTime: 2025-12-25 11:04:40
 -->
 <template>
-    <base-view>
+    <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
         <div class="tree-container">
             <scene-tree
+                ref="ref_scene_tree"
                 v-if="state_store.shareType == 2"
                 :sceneId="state_store.sceneId"
                 :camToWater="re_camToWater"
@@ -25,7 +26,8 @@
                 :dataSetVisible="re_dataSetVisible"
                 :elemVisible="re_elemVisible"
                 :showRoom="re_showRoom"
-                :resetRoom="re_resetRoom"></model-tree>
+                :resetRoom="re_resetRoom"
+                :resetElemAttr="re_resetElemAttr"></model-tree>
             <empty-comp v-else></empty-comp>
         </div>
     </base-view>
@@ -42,11 +44,23 @@ import { useStateStore } from '@/stores/state';
 
 const state_store = useStateStore();
 const NativeBridge = (window as any).$reapi;
+const ref_scene_tree = ref<InstanceType<typeof SceneTree> | null>(null);
 
 onMounted(() => {
-
+    setTimeout(() => {
+        handle_appToWebMsg({ type: 'Listen.loadDataSetFinish' });
+    }, 10000);
 });
 
+// MARK App->Web 接收App消息
+const handle_appToWebMsg = (msgData: any) => {
+    if (msgData) {
+        if (msgData.type == 'Listen.loadDataSetFinish') {
+            console.log(' -----  >>>   Listen.loadDataSetFinish');
+            ref_scene_tree.value?.engine_callback_loadDataSetFinish();
+        }
+    }
+};
 
 // MARK Engine 定位水面
 const re_camToWater = (e: any) => {
@@ -169,6 +183,11 @@ const re_resetRoom = () => {
     let dataSetId = state_store.sceneId;
     NativeBridge.endClip();
     NativeBridge.resetElemAttr({ dataSetId: dataSetId, elemIdList: [] });
+};
+
+// MARK Engine 重置构件颜色和透明度
+const re_resetElemAttr = () => {
+    NativeBridge.resetElemAttr({ dataSetId: '', elemIdList: [] });
 };
 
 // MARK Data 合并包围盒

@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-12-10 16:27:06
+ * @LastEditTime: 2025-12-24 10:46:17
  */
 import config from './config'
 import reApi from './reApi'
@@ -12,6 +12,7 @@ import { showLoading, hideLoading } from './loading'
 export default {
     install(app: any) {
         (window as any).$service = {
+            getSharedSceneById: serviceApi.getSharedSceneById,
             getSharedProjectSceneTree: serviceApi.getSharedProjectSceneTree,
             getSharedProjectTree: serviceApi.getSharedProjectTree,
             getSharedProjectTreeSubNodesByLazy: serviceApi.getSharedProjectTreeSubNodesByLazy,
@@ -22,6 +23,8 @@ export default {
             getSharedRoomList: serviceApi.getSharedRoomList,
             getSharedRoomElement: serviceApi.getSharedRoomElement,
             getSharedRoomInfo: serviceApi.getSharedRoomInfo,
+            getSharedBimElemTreeNodesByGroupService: serviceApi.getSharedBimElemTreeNodesByGroupService,
+            getSharedBimElemIdsByGroupService: serviceApi.getSharedBimElemIdsByGroupService,
         };
 
         (window as any).$reapi = {

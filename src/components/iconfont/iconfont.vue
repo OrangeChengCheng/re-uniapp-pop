@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2024-08-26 17:05:26
- * @LastEditTime: 2024-08-26 18:16:23
+ * @LastEditTime: 2025-12-25 18:02:19
 -->
 <template>
     <text class="iconfont" :class="symbolId" :style="[{ color: color_computed, fontSize: size }]" @click="$emit('click', $event)"></text>
@@ -25,7 +25,7 @@ const props = defineProps({
     },
     color: {
         type: String,
-        default: '--color-main-blue',
+        default: '--color-white',
     },
     size: {
         type: String,
@@ -42,7 +42,7 @@ const color_computed = computed(() => {
     } else if (props.color.length == 6) {
         return `#${props.color}`;
     } else {
-        return 'var(--color-main-blue)';
+        return 'var(--color-white)';
     }
 });
 </script>

@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2025-12-11 16:15:08
+ * @LastEditTime: 2025-12-25 10:49:29
  */
 import { defineStore } from 'pinia'
 
@@ -20,6 +20,8 @@ import { defineStore } from 'pinia'
     21 场景CAD
     22 场景矢量
     23 水面
+    24 挤出
+    25 单体化
 */
 
 interface StateMold {
@@ -29,6 +31,8 @@ interface StateMold {
     shareType: number,
     sceneId: string,
     webPopId: string,
+    modelTypeList: any,
+    notModelTypeList: any,
     testMsg: string,
 }
 
@@ -41,6 +45,8 @@ export const useStateStore = defineStore('state', {
         shareType: 0,// 0：无 1：模型 2：场景
         sceneId: "",// app当前场景id，shareType=1代表数据集id  shareType=2代表场景id
         webPopId: "",// 当前web弹窗id
+        modelTypeList: [0, 10, 11, 13, 14, 15, 16, 20, 21, 22],// 模型加载类型的数据集
+        notModelTypeList: [23, 24, 25],// 非模型加载类型的数据集
         testMsg: "",// 测试信息
     }),
     actions: {

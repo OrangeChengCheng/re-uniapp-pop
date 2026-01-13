@@ -1,13 +1,17 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-04-19 12:22:25
- * @LastEditTime: 2025-07-24 16:35:53
+ * @LastEditTime: 2025-12-24 10:45:38
  */
 import { requestPost, requestGet } from '@/service/request';
 
 
 
-
+// MOD-- 场景 相关
+// 获取场景信息
+export function getSharedSceneById(sceneId: string) {
+    return requestGet(`/scene/v3/${sceneId}`);
+}
 
 // MOD-- 目录树 相关
 
@@ -59,6 +63,16 @@ export function getSharedRoomElement(data: any) {
 // 获取房间信息
 export function getSharedRoomInfo(data: any) {
     return requestPost('/engine/v3/room/element/parameter/list', data);
+}
+
+// 根据分组获取目录树子节点
+export function getSharedBimElemTreeNodesByGroupService(data: any) {
+    return requestPost('/dataSet/v3/rvtGroupTreeNodes', data);
+}
+
+// 获取RvtGroup节点关联的构件id
+export function getSharedBimElemIdsByGroupService(data: any) {
+    return requestPost('/element/v3/getRvtGroupTreeChildren', data);
 }
 
 
