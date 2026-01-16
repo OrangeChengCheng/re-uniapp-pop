@@ -50,7 +50,7 @@
 // MOD-- JavaScript
 <script setup lang="ts">
 import { ElTree } from 'element-plus';
-import { ref, onMounted, nextTick, computed } from 'vue';
+import { ref, onMounted, nextTick, computed, watch } from 'vue';
 import { useStateStore } from '@/stores/state';
 
 const state_store = useStateStore();
@@ -60,12 +60,15 @@ const props = defineProps({
     sceneId: String,
     camToWater: Function,
     camToExtrude: Function,
+    camToMonomer: Function,
     camToElem: Function,
     camToDataSet: Function,
     waterVisible: Function,
     extrudeVisible: Function,
+    monomerVisible: Function,
     dataSetVisible: Function,
     elemVisible: Function,
+    updateTreeData: Function,
 });
 
 const ref_eltree = ref<InstanceType<typeof ElTree> | null>(null);
@@ -131,6 +134,16 @@ const computed_nodeIconId = computed(() => (nodeData: any) => {
             return 'icon-dantihua';
     }
 });
+
+watch(
+    () => treeList.value,
+    () => {
+        props.updateTreeData?.(treeList.value);
+    },
+    {
+        deep: true,
+    }
+);
 
 onMounted(() => {
     service_getSharedSceneInfo();
@@ -247,6 +260,122 @@ const service_getTreeSubNodesByLazy_default = async (nodeData: any, node: any) =
     eltree_updataNode(node);
 };
 
+// MARK service 获取目录树子节点信息-单体化
+const service_getTreeSubNodes_monomer = (nodeData: any, node: any) => {
+    node.expanded = false;
+    node.loading = true;
+
+    const sceneTreeRef = ref_eltree.value;
+    const tempNode: any = sceneTreeRef?.getNode(`tempNode-${nodeData.nodeId}`);
+    sceneTreeRef?.remove(tempNode);
+
+    const subNodes: any[] = [];
+    if (nodeData.customNodeType === 'monomer') {
+        const monomerInfo = nodeData.monomerizationInfo;
+
+        const monomerUnits = monomerInfo.levelJson;
+        monomerUnits.forEach((unit: any) => {
+            unit.customNodeType = 'monomerUnit';
+            unit.monomerRegNodeId = nodeData.nodeId;
+            unit.monomerName = nodeData.monomerName;
+            unit.monomerId = unit.id;
+            unit.nodeId = unit.id;
+            unit.nodeName = `${unit.name}单元`;
+            unit.nodeType = 2;
+            unit.dataSetType = nodeData.dataSetType;
+            unit.displayMode = monomerInfo.displayMode;
+            unit.dataSetId = monomerInfo.dataSetId;
+            // 构建伪节点，用于展开单体化子节点 prettier-ignore
+            unit.subNodes = [{ nodeId: `tempNode-${unit.nodeId}`, nodeName: '' }];
+            subNodes.push(unit);
+        });
+    }
+
+    if (nodeData.customNodeType === 'monomerUnit') {
+        const monomerFloors = nodeData.floors;
+        monomerFloors.forEach((floor: any) => {
+            floor.customNodeType = 'monomerFloor';
+            floor.monomerRegNodeId = nodeData.monomerRegNodeId;
+            floor.monomerName = nodeData.monomerName;
+            floor.monomerId = floor.id;
+            floor.nodeId = floor.id;
+            floor.nodeType = 2;
+            floor.nodeName = `${nodeData.nodeName}${floor.name}`;
+            floor.dataSetType = nodeData.dataSetType;
+            floor.displayMode = nodeData.displayMode;
+            floor.dataSetId = nodeData.dataSetId;
+            // 构建伪节点，用于展开单体化子节点 prettier-ignore
+            floor.subNodes = [{ nodeId: `tempNode-${floor.nodeId}`, nodeName: '' }];
+            subNodes.push(floor);
+        });
+    }
+
+    if (nodeData.customNodeType === 'monomerFloor') {
+        const monomerRooms = nodeData.rooms;
+        monomerRooms.forEach((room: any) => {
+            room.customNodeType = 'monomerRoom';
+            room.monomerRegNodeId = nodeData.monomerRegNodeId;
+            room.monomerName = nodeData.monomerName;
+            room.monomerId = room.id;
+            room.nodeId = room.id;
+            room.nodeName = `${nodeData.nodeName}${room.name}户`;
+            room.nodeType = 2;
+            room.dataSetType = nodeData.dataSetType;
+            room.displayMode = nodeData.displayMode;
+            room.dataSetId = nodeData.dataSetId;
+            subNodes.push(room);
+        });
+    }
+    sceneTreeRef?.updateKeyChildren(nodeData.nodeId, subNodes);
+
+    // 获取完数据，结束加载和处理勾选数据
+    eltree_updataNode(node);
+};
+
+// MARK service 根据节点列表获取单体化对象列表
+const service_getMonomerByNodes = (nodeData: any) => {
+    let monomerList: any[] = [];
+
+    const flattenRooms = (rooms: any, source: any) => rooms.map((room: any) => createMonomerObj(source, room));
+    const flattenFloors = (floors: any, source: any) => floors.flatMap((floor: any) => flattenRooms(floor.rooms, source));
+    const flattenUnits = (units: any, source: any) => units.flatMap((unit: any) => flattenFloors(unit.floors, source));
+
+    const createMonomerObj = (source: any, room: any) => ({
+        displayMode: source.displayMode,
+        dataSetId: source.dataSetId,
+        monomerId: room.id,
+        geoJson: room.geoJson,
+    });
+
+    // 主处理逻辑
+    nodeData.forEach((item: any) => {
+        switch (item.customNodeType) {
+            case 'monomer': {
+                // prettier-ignore
+                const monomers = flattenUnits(item.monomerizationInfo.levelJson, item.monomerizationInfo)
+                monomerList.push(...monomers);
+                break;
+            }
+            case 'monomerUnit': {
+                const unitMonomers = flattenFloors(item.floors, item);
+                monomerList.push(...unitMonomers);
+                break;
+            }
+            case 'monomerFloor': {
+                const floorMonomers = flattenRooms(item.rooms, item);
+                monomerList.push(...floorMonomers);
+                break;
+            }
+            case 'monomerRoom': {
+                monomerList.push(createMonomerObj(item, item));
+                break;
+            }
+        }
+    });
+
+    return monomerList;
+};
+
 // MARK service 获取构件id-默认数据
 const service_getElemIds_default = async (nodeData: any) => {
     if (nodeData.enableLazyLoading) {
@@ -350,7 +479,7 @@ const handle_formatSceneTree = (list: any) => {
     return sceneData;
 };
 
-// MARK tree 格式化-单体化信息对象
+// MARK data 格式化-单体化信息对象
 const handle_formatMonomerInfo = (monomerInfo: any) => {
     const units = monomerInfo.levelJson;
     const firstRoom = units[0].floors[0].rooms[0];
@@ -361,8 +490,9 @@ const handle_formatMonomerInfo = (monomerInfo: any) => {
     const rooms = units.flatMap((unit: any) => unit.floors.flatMap((floor: any) => floor.rooms));
     rooms.forEach((room: any) => {
         const roomGeoJson = JSON.parse(room.geoJson);
-        const { red, green, blue, alpha } = roomGeoJson.fenceClr;
-        const monomerClr = [red, green, blue, alpha];
+        const fenceClr = roomGeoJson.fenceClr;
+        const { red, green, blue, alpha } = fenceClr;
+        const monomerClr = { red, green, blue, alpha: 128 };
         const heightMin = roomGeoJson.potList[0][2];
         const heightMax = roomGeoJson.potList[0][2] + roomGeoJson.potList[0][3];
         const pointList = roomGeoJson.potList.map((el: any) => el.slice(0, 3));
@@ -380,7 +510,7 @@ const handle_formatMonomerInfo = (monomerInfo: any) => {
     return monomerInfo;
 };
 
-// MARK tree 格式化-单体化树结构
+// MARK data 格式化-单体化树结构
 const handle_formatMonomerData = (monomerTreeNode: any) => {
     const monomerInfo = monomerTreeNode.monomerizationInfo;
 
@@ -556,6 +686,12 @@ const handle_isWaterNode = (nodeData: any) => {
 const handle_isExtrudeNode = (nodeData: any) => {
     let dataSetType = nodeData.dataSetType;
     return dataSetType === 24;
+};
+
+// MARK data 判断-单体化数据
+const handle_isMonomerNode = (nodeData: any) => {
+    let dataSetType = nodeData.dataSetType;
+    return dataSetType === 25;
 };
 
 // MARK data 查找-所有节点指定keys
@@ -945,10 +1081,10 @@ const eltree_updateShowType = () => {
 
 // // MARK eltree 节点被展开
 const eltree_nodeExpand = (nodeData: any, node: any) => {
-    // if (nodeData.dataSetType === 25) {
-    //     this.expandMonomerNode(nodeData, node);
-    //     return;
-    // }
+    if (nodeData.dataSetType === 25) {
+        eltree_nodeExpand_monomer(nodeData, node);
+        return;
+    }
 
     if (!nodeData.customNodeType) return;
     if (nodeData.dataSetType !== 0) return;
@@ -967,6 +1103,7 @@ const eltree_nodeExpand = (nodeData: any, node: any) => {
 
 // MARK eltree 节点-被展开-分组数据
 const eltree_nodeExpand_group = (nodeData: any, node: any) => {
+    // 如果已经展开则处理子节点勾选状态
     const isNodeExpanded = nodeData.subNodes[0]?.uniqueId;
     if (isNodeExpanded) {
         if (node.checked) {
@@ -976,11 +1113,13 @@ const eltree_nodeExpand_group = (nodeData: any, node: any) => {
         }
         return;
     }
+
     service_getTreeSubNodes_group(nodeData, node);
 };
 
 // MARK eltree 节点-被展开-默认数据
 const eltree_nodeExpand_default = (nodeData: any, node: any) => {
+    // 如果已经展开则处理子节点勾选状态
     const isNodeExpanded = nodeData.subNodes[0]?.uniqueId;
     if (isNodeExpanded) {
         if (node.checked) {
@@ -999,19 +1138,55 @@ const eltree_nodeExpand_default = (nodeData: any, node: any) => {
     }
 };
 
+// MARK eltree 节点-被展开-单体化数据
+const eltree_nodeExpand_monomer = (nodeData: any, node: any) => {
+    // 如果是单体化根节点或者文件夹节点，直接展开
+    if (nodeData.nodeType !== 2) return;
+
+    // 如果已经展开则处理子节点勾选状态
+    let isNodeExpanded_monomer = false;
+    const nodeId = nodeData.subNodes[0]?.nodeId;
+    if (nodeId && !nodeId.includes('tempNode')) {
+        isNodeExpanded_monomer = true;
+    }
+    if (isNodeExpanded_monomer) {
+        if (node.checked) {
+            node.childNodes.forEach((item: any) => {
+                item.checked = true;
+            });
+        }
+        return;
+    }
+
+    service_getTreeSubNodes_monomer(nodeData, node);
+};
+
 // MARK eltree 节点被点击
 const eltree_nodeClick = async (nodeData: any, node: any) => {
     if (handle_isWaterNode(nodeData)) {
-        let leafNodes = handle_findAllNodeByLevel([nodeData], 2);
-        let waterIds = leafNodes.map((item: any) => item.waterId);
+        const leafNodes = handle_findAllNodeByLevel([nodeData], 2);
+        const waterIds = leafNodes.map((item: any) => item.waterId);
         engine_camToWater(waterIds);
         return;
     }
 
     if (handle_isExtrudeNode(nodeData)) {
-        let leafNodes = handle_findAllNodeByLevel([nodeData], 2);
-        let extrudeIds = leafNodes.map((item: any) => item.extrudeId);
+        const leafNodes = handle_findAllNodeByLevel([nodeData], 2);
+        const extrudeIds = leafNodes.map((item: any) => item.extrudeId);
         engine_camToExtrude(extrudeIds);
+        return;
+    }
+
+    if (handle_isMonomerNode(nodeData)) {
+        let monomerList: any[] = [];
+        if (!nodeData.customNodeType) {
+            const leafNodes = handle_findAllNodeByLevel([nodeData], 2);
+            monomerList = service_getMonomerByNodes(leafNodes);
+        } else {
+            monomerList = service_getMonomerByNodes([nodeData]);
+        }
+        const monomerIds = monomerList.map((item: any) => item.monomerId);
+        engine_camToMonomer(monomerIds);
         return;
     }
 
@@ -1084,6 +1259,26 @@ const eltree_check = async (nodeData: any) => {
         let leafNodes = handle_findAllNodeByLevel([nodeData], 2);
         let extrudeIds = leafNodes.map((item: any) => item.extrudeId);
         engine_extrudeVisible(extrudeIds, node.checked);
+
+        if (isRvtGroupMode.value) {
+            eltree_check_childNodesCheckStatus(nodeData, node.checked);
+            eltree_check_parentNodesCheckStatus(node.parent);
+        }
+        return;
+    }
+
+    if (handle_isMonomerNode(nodeData)) {
+        let monomerList: any[] = [];
+        if (!nodeData.customNodeType) {
+            let leafNodes = handle_findAllNodeByLevel([nodeData], 2);
+            leafNodes = leafNodes.filter((item: any) => item.customNodeType === 'monomer');
+            monomerList = service_getMonomerByNodes(leafNodes);
+        } else {
+            monomerList = service_getMonomerByNodes([nodeData]);
+        }
+        const monomerIds = monomerList.map((item: any) => item.monomerId);
+
+        engine_monomerVisible(monomerIds, node.checked);
 
         if (isRvtGroupMode.value) {
             eltree_check_childNodesCheckStatus(nodeData, node.checked);
@@ -1291,6 +1486,11 @@ const engine_camToExtrude = (extrudeIdList: any) => {
     props.camToExtrude?.(extrudeIdList);
 };
 
+// MARK Engine 定位单体化
+const engine_camToMonomer = (monomerIdList: any) => {
+    props.camToMonomer?.(monomerIdList);
+};
+
 // MARK Engine 定位单构件
 const engine_camToEntity = (allDataSets: any) => {
     let dataSets: any = [];
@@ -1371,6 +1571,11 @@ const engine_waterVisible = (waterIdList: any, visible: boolean) => {
 // MARK Engine 挤出显示隐藏
 const engine_extrudeVisible = (extrudeIdList: any, visible: boolean) => {
     props.extrudeVisible?.(extrudeIdList, visible);
+};
+
+// MARK Engine 单体化显示隐藏
+const engine_monomerVisible = (monomerIdList: any, visible: boolean) => {
+    props.monomerVisible?.(monomerIdList, visible);
 };
 // MARK 暴露方法给父组件
 defineExpose({

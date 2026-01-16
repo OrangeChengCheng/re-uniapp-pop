@@ -31,7 +31,7 @@
 // MOD-- JavaScript
 <script setup lang="ts">
 import { ElTree } from 'element-plus';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import ElemComp from './ElemComp.vue';
 import RoomComp from './RoomComp.vue';
 import type { TabsPaneContext } from 'element-plus';
@@ -47,6 +47,7 @@ const props = defineProps({
     showRoom: Function,
     resetRoom: Function,
     resetElemAttr: Function,
+    updateTreeData: Function,
 });
 
 const ref_elem_comp = ref<InstanceType<typeof ElemComp> | null>(null);
@@ -55,6 +56,16 @@ const activeName = ref('elem');
 const roomExist = ref(false);
 const elem_treeList = ref<any[]>([]);
 const room_treeList = ref<any[]>([]);
+
+watch(
+    () => elem_treeList.value,
+    () => {
+        props.updateTreeData?.(elem_treeList.value);
+    },
+    {
+        deep: true,
+    }
+);
 
 onMounted(() => {
     service_getInfo();

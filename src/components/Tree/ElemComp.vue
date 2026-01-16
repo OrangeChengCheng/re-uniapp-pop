@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-23 15:15:48
- * @LastEditTime: 2025-12-25 18:15:30
+ * @LastEditTime: 2026-01-15 16:16:38
 -->
 <template>
     <div class="sup-elem-comp">
@@ -84,6 +84,7 @@ watch(
     }
 );
 
+
 const isOptionVisible = computed(() => {
     if (!treeList.value.length) return false;
     const rootNode = treeList.value[0];
@@ -137,7 +138,7 @@ const eltree_updateShowType = (isShowRvtGroup: boolean) => {
     });
 
     // 重置高亮状态
-    domRef?.setCurrentKey("");
+    domRef?.setCurrentKey('');
 
     // 配置数据
     nextTick(() => {

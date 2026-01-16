@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2025-12-25 11:04:40
+ * @LastEditTime: 2026-01-15 17:22:20
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -12,12 +12,15 @@
                 :sceneId="state_store.sceneId"
                 :camToWater="re_camToWater"
                 :camToExtrude="re_camToExtrude"
+                :camToMonomer="re_camToMonomer"
                 :camToElem="re_camToElem"
                 :camToDataSet="re_camToDataSet"
                 :waterVisible="re_waterVisible"
                 :extrudeVisible="re_extrudeVisible"
+                :monomerVisible="re_monomerVisible"
                 :dataSetVisible="re_dataSetVisible"
-                :elemVisible="re_elemVisible"></scene-tree>
+                :elemVisible="re_elemVisible"
+                :updateTreeData="re_updateTreeData"></scene-tree>
             <model-tree
                 v-else-if="state_store.shareType == 1"
                 :sceneId="state_store.sceneId"
@@ -27,7 +30,8 @@
                 :elemVisible="re_elemVisible"
                 :showRoom="re_showRoom"
                 :resetRoom="re_resetRoom"
-                :resetElemAttr="re_resetElemAttr"></model-tree>
+                :resetElemAttr="re_resetElemAttr"
+                :updateTreeData="re_updateTreeData"></model-tree>
             <empty-comp v-else></empty-comp>
         </div>
     </base-view>
@@ -62,6 +66,12 @@ const handle_appToWebMsg = (msgData: any) => {
     }
 };
 
+// MARK Engine 更新目录树数据
+const re_updateTreeData = (e: any) => {
+    console.log('re_updateTreeData: ', e);
+    NativeBridge.updateTreeData({ treeData: e });
+};
+
 // MARK Engine 定位水面
 const re_camToWater = (e: any) => {
     NativeBridge.setCamLocToWater({ waterNameList: e });
@@ -70,6 +80,18 @@ const re_camToWater = (e: any) => {
 // MARK Engine 定位挤出
 const re_camToExtrude = (e: any) => {
     NativeBridge.setCamLocToExtrude({ extrudeIdst: e });
+};
+
+// MARK Engine 定位单体化
+const re_camToMonomer = async (e: any) => {
+    NativeBridge.delFromSelMonomer({ monomerIds: [] });
+
+    const monomerSelAttr = await NativeBridge.getMonomerSelAttr();
+    monomerSelAttr.monomerClr = [255, 0, 0, 128];
+
+    NativeBridge.setMonomerSelAttr({ monomerSelAttr: monomerSelAttr });
+    NativeBridge.addToSelMonomer({ monomerIds: e });
+    NativeBridge.setCamLocToMonomer({ monomerIds: e });
 };
 
 // MARK Engine 定位数据集
@@ -111,6 +133,11 @@ const re_extrudeVisible = (extrudeIds: any, visible: boolean) => {
     extrudeIds.forEach((item: any) => {
         NativeBridge.extrudeVisible({ extrudeId: item, visible: visible });
     });
+};
+
+// MARK Engine 单体化显隐
+const re_monomerVisible = (monomerIds: any, visible: boolean) => {
+    NativeBridge.monomerVisible({ monomerIds: monomerIds, visible: visible });
 };
 
 // MARK Engine 数据集显隐

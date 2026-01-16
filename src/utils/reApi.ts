@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2025-12-11 15:24:06
+ * @LastEditTime: 2026-01-15 17:22:07
  */
 
 import { useStateStore } from '@/stores/state';
@@ -23,9 +23,10 @@ interface ApiMethods {
     isInNativeApp(): any;
     getPlatform(): string;
     registerAppMsg(callback: Function): void;
-    sendMsgWebToApp(type: string, data?: any, callback?: Function): void;
+    sendMsgWebToApp(type: string, data?: any, callback?: Function, nolog?: boolean): void;
     requestAppToWeb(data: any): Promise<any>;
     logToApp(data: any): void;
+    updateTreeData(data: any): void;
     getInitUrlParam(): any;
     webInit(): void;
     cloose(data: any): void;
@@ -44,12 +45,18 @@ interface ApiMethods {
     setSelElemsAttr(data: any): void;
     setCamLocToWater(data: any): void;
     setCamLocToExtrude(data: any): void;
+    setCamLocToMonomer(data: any): void;
+    addToSelMonomer(data: any): void;
+    delFromSelMonomer(data: any): void;
+    setMonomerSelAttr(data: any): void;
+    getMonomerSelAttr(data: any): Promise<any>;
     getBIMDataSetBV(data: any): Promise<any>;
     getGridDataSetBV(data: any): Promise<any>;
     getDataSetTerrId(data: any): Promise<any>;
     getAllUnitNames(data: any): Promise<any>;
     waterVisible(data: any): void;
     extrudeVisible(data: any): void;
+    monomerVisible(data: any): void;
     setUnitActive(data: any): void;
     setGridValidState(data: any): void;
     getDataSetAllElemIDs(data: any): Promise<any>;
@@ -100,7 +107,7 @@ const api: ApiMethods = {
     },
 
     // MARK re-api 发送消息到原生应用
-    sendMsgWebToApp: (type: string, data?: any, callback?: Function): void => {
+    sendMsgWebToApp: (type: string, data?: any, callback?: Function, nolog?: boolean): void => {
         const msgId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
         const state_store = useStateStore();
         const bridgeMsg: BridgeMsg = {
@@ -118,7 +125,7 @@ const api: ApiMethods = {
         const platform = api.getPlatform();
         const messageString = JSON.stringify(bridgeMsg);
 
-        console.log(`向 ${platform} 发送消息:`, messageString);
+        if (!nolog) console.log(`向 ${platform} 发送消息:`, messageString);
 
         switch (platform) {
             case 'ios':
@@ -133,7 +140,7 @@ const api: ApiMethods = {
 
             case 'web':
                 // Web 环境下的处理（可用于调试）
-                console.log('Web 环境下，模拟发送消息:', bridgeMsg);
+                if (!nolog) console.log('Web 环境下，模拟发送消息:', bridgeMsg);
                 break;
         }
     },
@@ -149,6 +156,12 @@ const api: ApiMethods = {
 
     logToApp: (data: any): void => {
         api.sendMsgWebToApp("log", { log: data });
+    },
+
+    // MARK re-api 更新目录树数据
+    updateTreeData: (data: any): void => {
+        // api.sendMsgWebToApp("updateTreeData", data, undefined, true);
+        api.sendMsgWebToApp("updateTreeData", data);
     },
 
     // MARK re-api 接收初始化参数
@@ -288,6 +301,35 @@ const api: ApiMethods = {
         api.sendMsgWebToApp('setCamLocToExtrude', data);
     },
 
+    // MARK re-api 相机定位单体化
+    setCamLocToMonomer: (data: any): void => {
+        api.sendMsgWebToApp('setCamLocToMonomer', data);
+    },
+
+    // MARK re-api 添加单体化到选择集
+    addToSelMonomer: (data: any): void => {
+        api.sendMsgWebToApp('addToSelMonomer', data);
+    },
+
+    // MARK re-api 从单体化选择集中删除
+    delFromSelMonomer: (data: any): void => {
+        api.sendMsgWebToApp('delFromSelMonomer', data);
+    },
+
+    // MARK re-api 设置单体化选择集属性信息
+    setMonomerSelAttr: (data: any): void => {
+        api.sendMsgWebToApp('setMonomerSelAttr', data);
+    },
+
+    // MARK re-api 获取单体化选择集属性信息
+    getMonomerSelAttr: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('getMonomerSelAttr', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
     // MARK re-api 获取数据集总包围盒信息
     getBIMDataSetBV: (data: any): Promise<any> => {
         return new Promise((resolve) => {
@@ -342,6 +384,11 @@ const api: ApiMethods = {
     // MARK re-api 挤出显隐
     extrudeVisible: (data: any): void => {
         api.sendMsgWebToApp('extrudeVisible', data);
+    },
+
+    // MARK re-api 单体化显隐
+    monomerVisible: (data: any): void => {
+        api.sendMsgWebToApp('monomerVisible', data);
     },
 
     // MARK re-api 获取某一个数据集的可见的元素id集合

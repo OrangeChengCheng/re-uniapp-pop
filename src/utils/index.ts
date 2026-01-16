@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2025-12-24 10:46:17
+ * @LastEditTime: 2026-01-16 09:49:09
  */
 import config from './config'
 import reApi from './reApi'
@@ -33,6 +33,7 @@ export default {
             registerAppMsg: reApi.registerAppMsg,
             requestAppToWeb: reApi.requestAppToWeb,
             logToApp: reApi.logToApp,
+            updateTreeData: reApi.updateTreeData,
             getInitUrlParam: reApi.getInitUrlParam,
             webInit: reApi.webInit,
             cloose: reApi.cloose,
@@ -51,12 +52,18 @@ export default {
             setSelElemsAttr: reApi.setSelElemsAttr,
             setCamLocToWater: reApi.setCamLocToWater,
             setCamLocToExtrude: reApi.setCamLocToExtrude,
+            setCamLocToMonomer: reApi.setCamLocToMonomer,
+            addToSelMonomer: reApi.addToSelMonomer,
+            delFromSelMonomer: reApi.delFromSelMonomer,
+            setMonomerSelAttr: reApi.setMonomerSelAttr,
+            getMonomerSelAttr: reApi.getMonomerSelAttr,
             getBIMDataSetBV: reApi.getBIMDataSetBV,
             getGridDataSetBV: reApi.getGridDataSetBV,
             getDataSetTerrId: reApi.getDataSetTerrId,
             getAllUnitNames: reApi.getAllUnitNames,
             waterVisible: reApi.waterVisible,
             extrudeVisible: reApi.extrudeVisible,
+            monomerVisible: reApi.monomerVisible,
             setUnitActive: reApi.setUnitActive,
             setGridValidState: reApi.setGridValidState,
             getDataSetAllElemIDs: reApi.getDataSetAllElemIDs,
@@ -66,9 +73,7 @@ export default {
             endClip: reApi.endClip,
         };
         (window as any).$tool = {
-            url_handle: tool.url_handle,
-            time_compare: tool.time_compare,
-            cam_defauleDataSet: tool.cam_defauleDataSet,
+            data_deepClone: tool.data_deepClone,
         };
 
         app.config.globalProperties.$showLoading = showLoading;
