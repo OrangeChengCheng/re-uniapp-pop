@@ -33,14 +33,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="custom-button-box">
+                    <!-- <div class="custom-button-box">
                         <div class="button-item-box" v-if="data.nodeType === 3 && data.hasRvtGroup" @click.stop="eltree_updateShowType">
                             <div class="btn-icon-box">
                                 <icon-font name="icon-biaogao" size="14px" :class="`${isRvtGroupMode ? '' : 'active'}`"></icon-font>
                                 <icon-font name="icon-fenzu" size="14px" :class="`${isRvtGroupMode ? 'active' : ''}`"></icon-font>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </template>
         </el-tree>

@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-23 15:15:48
- * @LastEditTime: 2026-01-15 16:16:38
+ * @LastEditTime: 2026-02-27 09:57:28
 -->
 <template>
     <div class="sup-elem-comp">
@@ -86,6 +86,7 @@ watch(
 
 
 const isOptionVisible = computed(() => {
+    return false;
     if (!treeList.value.length) return false;
     const rootNode = treeList.value[0];
     const formatType = rootNode.formatType;
