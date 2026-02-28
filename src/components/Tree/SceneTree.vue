@@ -243,7 +243,7 @@ const service_getTreeSubNodesByLazy_default = async (nodeData: any, node: any) =
     };
 
     const response = await REService.getSharedProjectTreeSubNodesByLazy(params);
-    nodeData.subNodes = response.data.map((item: any) => {
+    nodeData.subNodes = response.map((item: any) => {
         item['customNodeType'] = 'pakChildNode';
         item['dataSetType'] = nodeData.dataSetType;
         item['dataSetId'] = nodeData.dataSetId;
