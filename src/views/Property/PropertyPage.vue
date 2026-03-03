@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-07 14:58:27
- * @LastEditTime: 2026-01-16 10:29:33
+ * @LastEditTime: 2026-03-03 16:27:40
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -91,31 +91,32 @@ onMounted(() => {
 
     const msgData3 = {
         data: {
+            selType: 'Listen.systemSelElement',
             dataSetType: 19,
             entityList: [
                 {
-                    dataSetCRS: '',
-                    dataSetId: '3a1ed2bc-aa23-97cf-5a51-523bee673da2',
+                    dataSetCRS: 'EPSG:3857',
+                    dataSetId: '3a1fb07c-ba2b-c027-c7c5-59816e4a4516',
                     elemId: 11,
-                    entityId: '3a1ed2b9-932b-d31a-8567-19affc5f949d',
+                    entityId: '3a1fb07c-a0af-d096-e1a8-addcdf97c179',
                     entityType: '1',
-                    offset: [-6.232807153377358, 30.25899877320936, 0.0],
+                    offset: [8.368505093061424, 3.650508541563303, 53.20011961200404],
                     rotate: [0.0, 0.0, 0.0, 1.0],
                     scale: [1.0, 1.0, 1.0],
                 },
             ],
             probeInfo: {
-                dataSetId: '3a1ed2bc-aa23-97cf-5a51-523bee673da2',
+                dataSetId: '3a1fb07c-ba2b-c027-c7c5-59816e4a4516',
                 dataSetIdList: [],
                 elemBV: [
-                    [-8.733482207630743, 28.290100659799037, -0.0017563740980506282],
-                    [-3.7193373101698057, 32.32107600159591, 3.006731327317965],
+                    [5.905903995037079, 1.315452799666673, 53.19797471165657],
+                    [10.831105411052704, 5.985563502181321, 58.201664954423904],
                 ],
-                elemCenter: [-3.186534346890621e-58, 2.712622938947e-312, -16.04693223164578],
+                elemCenter: [2.712851254014e-312, -8.713023375853349e-131, -3.18653643620945e-58],
                 elemId: 11,
                 elemIdStr: '',
-                elemPos: [-6.979416862386579, 31.865830216863216, 0.7324197091028992],
-                elemScrPos: [144, 631],
+                elemPos: [8.276522968354188, 3.3232937086181753, 55.65480803578114],
+                elemScrPos: [214, 406],
                 elemType: 'BIMElem',
             },
         },
@@ -758,7 +759,7 @@ onMounted(() => {
     //     handle_appToWebMsg(msgData);
     // }, 1000);
     // setTimeout(() => {
-    //     handle_appToWebMsg(msgData2);
+    //     handle_appToWebMsg(msgData3);
     // }, 2000);
 });
 
@@ -791,6 +792,7 @@ const ui_initData = () => {
 
 // MARK Listen 构件点击事件
 const listen_selElem = (re_selInfo: any) => {
+    re_selModel_cur.value = re_selInfo;
     if (re_selInfo.dataSetType == 0) {
         propertyType.value = 1;
         server_getAttrData_model(re_selInfo);
@@ -802,6 +804,7 @@ const listen_selElem = (re_selInfo: any) => {
 
 // MARK Listen 矢量点击事件
 const listen_selShpElem = (re_selInfo: any) => {
+    re_selModel_cur.value = re_selInfo;
     if (re_selInfo.probeInfo.elemIdStr.includes('Monomer')) {
         propertyType.value = 4;
         const monomerNode = server_getMonomerNode(re_selInfo.probeInfo.elemIdStr);
