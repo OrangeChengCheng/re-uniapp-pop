@@ -1,13 +1,13 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2025-07-29 16:45:46
+ * @LastEditTime: 2026-03-06 15:59:32
 -->
 <template>
     <transition name="slide-up-down" :class="{ 'disable-transition': disableTransition }" @after-leave="tran_after_leave">
         <div v-show="popViewShow" class="sup-base-view">
             <div class="cloose-area" @click="cloose_click">
-                <div class="cloose-line"></div>
+                <img :src="require('@/assets/img/icon_down.png')" />
             </div>
             <view class="base-solt">
                 <slot></slot>
@@ -139,13 +139,12 @@ defineExpose({
     display: flex;
     justify-content: center;
 
-    .cloose-line {
+    img {
         position: relative;
-        margin-top: 10px;
+        margin-top: 5px;
         width: 40px;
-        height: 4px;
-        border-radius: 2px;
-        background-color: white;
+        height: 15px;
+        filter: invert(1);
     }
 }
 
