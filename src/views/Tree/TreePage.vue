@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2026-01-15 17:22:20
+ * @LastEditTime: 2026-03-30 11:39:06
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -51,9 +51,9 @@ const NativeBridge = (window as any).$reapi;
 const ref_scene_tree = ref<InstanceType<typeof SceneTree> | null>(null);
 
 onMounted(() => {
-    setTimeout(() => {
-        handle_appToWebMsg({ type: 'Listen.loadDataSetFinish' });
-    }, 10000);
+    // setTimeout(() => {
+    //     handle_appToWebMsg({ type: 'Listen.loadDataSetFinish' });
+    // }, 10000);
 });
 
 // MARK App->Web 接收App消息

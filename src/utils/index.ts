@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2026-01-16 09:49:09
+ * @LastEditTime: 2026-04-14 16:29:31
  */
 import config from './config'
 import reApi from './reApi'
@@ -38,6 +38,18 @@ export default {
             webInit: reApi.webInit,
             cloose: reApi.cloose,
             popWebFull: reApi.popWebFull,
+
+
+
+            dbQuery: reApi.dbQuery,
+            dbTableExist: reApi.dbTableExist,
+
+            fileGetAllChild: reApi.fileGetAllChild,
+            fileGetChildBySuffix: reApi.fileGetChildBySuffix,
+
+
+
+
             setElemAlpha: reApi.setElemAlpha,
             setElemsValidState: reApi.setElemsValidState,
             setCamLocateToDataSet: reApi.setCamLocateToDataSet,
@@ -73,6 +85,7 @@ export default {
             endClip: reApi.endClip,
         };
         (window as any).$tool = {
+            toPromise: tool.toPromise,
             data_deepClone: tool.data_deepClone,
         };
 

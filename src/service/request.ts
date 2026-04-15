@@ -1,11 +1,13 @@
 /*
  * @Author: Lemon C
  * @Date: 2022-11-08 11:58:14
- * @LastEditTime: 2025-12-18 15:31:57
+ * @LastEditTime: 2026-04-15 16:46:53
  */
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { useStateStore } from '@/stores/state';
 import { ElMessageBox as MessageBox } from 'element-plus';
+
+import { requestOffline } from '@/service/offlineService';
 
 const RE_ServerURl = "https://engine3.bjblackhole.com";
 const RE_ServerRoute = "App3D";
@@ -123,36 +125,56 @@ function appRequest(type: string, resolve: any, reject: any, url: string, data?:
         })
 }
 
+/**
+ * app 原生请求（离线数据库版）
+ */
+function appRequestOffline(resolve: any, reject: any, url: string, data?: object) {
+    requestOffline(url, data).then((res: any) => {
+        if (res.isSuccess) {
+            if (res.data && res.data === '{}') {
+                res.data = {};
+            }
+            resolve(res.data);
+        } else {
+            resolve(null);
+        }
+    });
+}
+
 
 /**
  * POST请求封装（专注业务逻辑）
  */
 export function requestPost(url: string, data?: object): Promise<any> {
     return new Promise((resolve, reject) => {
-        if (!checkToken()) {
-            reject(new Error('Token无效'));
-            return;
-        }
-        const NativeBridge = (window as any).$reapi;
-        const platform = NativeBridge.getPlatform();
-        if (platform == 'web') {
-            service.post(`/${RE_ServerRoute}/project${url}`, data)
-                .then((response: any) => {
-                    let resData = response.data;
-                    if (resData.isSuccess) {
-                        if (resData.data && resData.data === '{}') {
-                            resData.data = {};
+        if (!window.isOffline) {
+            if (!checkToken()) {
+                reject(new Error('Token无效'));
+                return;
+            }
+            const NativeBridge = (window as any).$reapi;
+            const platform = NativeBridge.getPlatform();
+            if (platform == 'web') {
+                service.post(`/${RE_ServerRoute}/project${url}`, data)
+                    .then((response: any) => {
+                        let resData = response.data;
+                        if (resData.isSuccess) {
+                            if (resData.data && resData.data === '{}') {
+                                resData.data = {};
+                            }
+                            resolve(resData.data);
+                        } else {
+                            resolve(null);
                         }
-                        resolve(resData.data);
-                    } else {
-                        resolve(null);
-                    }
-                })
-                .catch((err: any) => {
-                    reject(err);
-                });
+                    })
+                    .catch((err: any) => {
+                        reject(err);
+                    });
+            } else {
+                appRequest("POST", resolve, reject, url, data);
+            }
         } else {
-            appRequest("POST", resolve, reject, url, data);
+            appRequestOffline(resolve, reject, url, data);
         }
     });
 }

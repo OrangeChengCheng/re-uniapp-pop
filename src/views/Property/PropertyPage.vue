@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-07 14:58:27
- * @LastEditTime: 2026-03-03 16:27:40
+ * @LastEditTime: 2026-04-15 16:17:37
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -50,9 +50,9 @@ onMounted(() => {
         data: {
             dataSetType: 0,
             probeInfo: {
-                dataSetId: '3a1e0f8e-f06f-7068-259b-3d8498f7f998',
+                dataSetId: '3a1dac58-d288-f55b-e902-ea8b7d573a5e',
                 elemType: 'BIMElem',
-                elemId: 23,
+                elemId: 1,
                 elemBV: [
                     [-19.009716033935547, -9.669635772705078, 2.438307046890259],
                     [6.417759418487549, 14.551069259643555, 2.495642900466919],
@@ -63,7 +63,7 @@ onMounted(() => {
             },
         },
         msgId: '',
-        type: 'Probe.getCurCombProbeRet',
+        type: 'Listen.systemSelElement',
         isResponse: false,
     };
 
@@ -755,8 +755,186 @@ onMounted(() => {
         type: 'updateTreeData',
     };
 
+    const resData = {
+        elementParamGroups: [
+            {
+                paramGroup: '构件信息',
+                paramDatas: [
+                    {
+                        paramType: '',
+                        paramValue: '1',
+                        paramName: '构件Id',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '表面',
+                        paramName: '构件名称',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+            {
+                paramGroup: '文件信息',
+                paramDatas: [
+                    {
+                        paramType: '',
+                        paramValue: '1',
+                        paramName: '文件Id',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '[revit]bim示例模型',
+                        paramName: '文件名称',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+            {
+                paramGroup: '尺寸标注',
+                paramDatas: [
+                    {
+                        paramType: '平方米',
+                        paramValue: '307.417',
+                        paramName: '投影面积',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '平方米',
+                        paramValue: '307.417',
+                        paramName: '表面积',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+            {
+                paramGroup: '标识数据',
+                paramDatas: [
+                    {
+                        paramType: '',
+                        paramValue: '',
+                        paramName: '名称',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '',
+                        paramName: '图像',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '',
+                        paramName: '标记',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '',
+                        paramName: '类型名称',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '',
+                        paramName: '注释',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '-1',
+                        paramName: '设计选项',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '124088',
+                        paramName: 'REVIT ID',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: 'ec47ad31-eac4-4d74-9587-bd80207820cd-0001e4b8',
+                        paramName: 'GUID',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+            {
+                paramGroup: '其他',
+                paramDatas: [
+                    {
+                        paramType: '立方米',
+                        paramValue: '0',
+                        paramName: '截面',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '地形',
+                        paramName: '类别',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '立方米',
+                        paramValue: '0',
+                        paramName: '净剪切/填充',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '',
+                        paramName: '族名称',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '立方米',
+                        paramValue: '0',
+                        paramName: '填充',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+            {
+                paramGroup: '阶段化',
+                paramDatas: [
+                    {
+                        paramType: '',
+                        paramValue: '新构造',
+                        paramName: '创建的阶段',
+                        paramsOrder: 0,
+                    },
+                    {
+                        paramType: '',
+                        paramValue: '无',
+                        paramName: '拆除的阶段',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+            {
+                paramGroup: '材质和装饰',
+                paramDatas: [
+                    {
+                        paramType: '',
+                        paramValue: '道路',
+                        paramName: '材质',
+                        paramsOrder: 0,
+                    },
+                ],
+            },
+        ],
+        extendParams: [],
+    };
+
     // setTimeout(() => {
-    //     handle_appToWebMsg(msgData);
+    //     ui_initData();
+    //     propertyType.value = 1;
+    //     handle_modelData(resData);
+    // }, 1000);
+    // setTimeout(() => {
+    //     handle_appToWebMsg(msgData4);
     // }, 1000);
     // setTimeout(() => {
     //     handle_appToWebMsg(msgData3);

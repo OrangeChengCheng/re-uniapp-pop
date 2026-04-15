@@ -1,13 +1,15 @@
+/*
+ * @Author: Lemon C
+ * @Date: 2025-07-04 17:07:26
+ * @LastEditTime: 2026-04-15 16:46:07
+ */
 
-import utils from '@/utils/index'
+
 
 declare global {
     interface Window {
-        $service: {
-            utils: string;
-            commonTimeout: number;
-            token: string;
-            tokenId?: string;
-        };
+        isOffline: boolean;// 是否使用离线数据
     }
 }
+
+export { };

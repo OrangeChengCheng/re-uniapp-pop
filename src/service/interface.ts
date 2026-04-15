@@ -1,16 +1,16 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-04-19 12:22:25
- * @LastEditTime: 2025-12-24 10:45:38
+ * @LastEditTime: 2026-04-15 16:43:27
  */
-import { requestPost, requestGet } from '@/service/request';
 
+import { requestPost, requestGet } from '@/service/request';
 
 
 // MOD-- 场景 相关
 // 获取场景信息
-export function getSharedSceneById(sceneId: string) {
-    return requestGet(`/scene/v3/${sceneId}`);
+export function getSharedSceneById(sceneId: any) {
+    return window.isOffline ? requestPost(`/scene/v3`, sceneId) : requestGet(`/scene/v3/${sceneId}`);
 }
 
 // MOD-- 目录树 相关

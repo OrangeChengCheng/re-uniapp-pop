@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2026-02-28 10:53:06
+ * @LastEditTime: 2026-04-14 18:26:24
  */
 
 import { useStateStore } from '@/stores/state';
@@ -31,6 +31,12 @@ interface ApiMethods {
     webInit(): void;
     cloose(data: any): void;
     popWebFull(data: any): void;
+    
+    fileGetAllChild(data: any): Promise<any>;
+    fileGetChildBySuffix(data: any): Promise<any>;
+    dbQuery(data: any): Promise<any>;
+    dbTableExist(data: any): Promise<any>;
+
     setElemAlpha(data: any): void;
     setElemsValidState(data: any): void;
     setCamLocateToDataSet(data: any): void;
@@ -208,6 +214,11 @@ const api: ApiMethods = {
             state_store.updateCurrWebPopId(result.webPopId);
         }
 
+        if (result.filePath && result.filePath.length > 0) {
+            console.log('文件路径:', result.filePath);
+            state_store.updateCurrFilePath(result.filePath);
+        }
+
         console.log('接收到的参数:', JSON.stringify(result));
         return result;
     },
@@ -226,6 +237,51 @@ const api: ApiMethods = {
     popWebFull: (data: any): void => {
         api.sendMsgWebToApp("popWebFull", data);
     },
+
+
+    // MOD-- 数据库模块 <---
+    
+    // MARK app-db 数据库查询
+    dbQuery: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('dbQuery', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+    
+    // MARK app-db 查询表是否存在
+    dbTableExist: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('dbTableExist', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+
+    // MOD-- 文件模块 <---
+
+    // MARK app-file 获取指定文件夹下所有文件列表
+    fileGetAllChild: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('fileGetAllChild', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+    // MARK app-file 获取文件夹内指定后缀的文件列表
+    fileGetChildBySuffix: (data: any): Promise<any> => {
+        return new Promise((resolve) => {
+            api.sendMsgWebToApp('fileGetChildBySuffix', data, (response: any) => {
+                resolve(response);
+            });
+        });
+    },
+
+
+    // MOD-- 引擎模块 <---
 
     // MARK re-api 设置模型构件透明度
     setElemAlpha: (data: any): void => {

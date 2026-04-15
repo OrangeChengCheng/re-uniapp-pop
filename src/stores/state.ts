@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2026-02-27 09:49:39
+ * @LastEditTime: 2026-03-30 11:20:22
  */
 import { defineStore } from 'pinia'
 
@@ -26,6 +26,8 @@ import { defineStore } from 'pinia'
 
 interface StateMold {
     pcDebug: boolean,
+    offline: boolean,
+    filePath: string,
     baseUrl: string,
     token: string,
     shareType: number,
@@ -40,6 +42,8 @@ interface StateMold {
 export const useStateStore = defineStore('state', {
     state: (): StateMold => ({
         pcDebug: true,// pc端调试
+        offline: true,// 是否是离线查看模式
+        filePath: "",// 离线查看模式下文件地址
         baseUrl: "",// app当前服务配置
         token: "",// app当前token
         shareType: 0,// 0：无 1：模型 2：场景
@@ -74,6 +78,11 @@ export const useStateStore = defineStore('state', {
         // MARK 更新当前的webPopId
         updateCurrWebPopId(webPopId: string) {
             this.webPopId = webPopId;
+        },
+
+        // MARK 更新当前的filePath
+        updateCurrFilePath(filePath: string) {
+            this.filePath = filePath;
         },
 
     }
