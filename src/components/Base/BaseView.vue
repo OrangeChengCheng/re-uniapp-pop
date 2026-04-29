@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2026-04-29 16:29:03
+ * @LastEditTime: 2026-04-29 18:30:25
 -->
 <template>
     <transition name="slide-up-down" :class="{ 'disable-transition': disableTransition }" @after-leave="tran_after_leave">
@@ -37,10 +37,10 @@ const currWebPopId = ref('');
 
 onMounted(() => {
     NativeBridge.registerAppMsg(handle_appToWebMsg);
-    if (state_store.pcDebug) {
+    if (window.pcDebug) {
         openView();
     }
-    if (state_store.debugConsole) {
+    if (window.isOffline) {
         new VConsole();
     }
 });
