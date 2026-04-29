@@ -9,6 +9,7 @@
 declare global {
     interface Window {
         isOffline: boolean;// 是否使用离线数据
+        VConsole: new () => any;// 调试窗口
     }
 }
 

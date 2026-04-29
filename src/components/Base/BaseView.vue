@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2026-03-06 15:59:32
+ * @LastEditTime: 2026-04-29 16:29:03
 -->
 <template>
     <transition name="slide-up-down" :class="{ 'disable-transition': disableTransition }" @after-leave="tran_after_leave">
@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useStateStore } from '@/stores/state';
+import VConsole from 'vconsole';
 
 const state_store = useStateStore();
 
@@ -38,6 +39,9 @@ onMounted(() => {
     NativeBridge.registerAppMsg(handle_appToWebMsg);
     if (state_store.pcDebug) {
         openView();
+    }
+    if (state_store.debugConsole) {
+        new VConsole();
     }
 });
 

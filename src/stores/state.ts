@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2026-03-30 11:20:22
+ * @LastEditTime: 2026-04-29 16:21:05
  */
 import { defineStore } from 'pinia'
 
@@ -25,6 +25,7 @@ import { defineStore } from 'pinia'
 */
 
 interface StateMold {
+    debugConsole: boolean,
     pcDebug: boolean,
     offline: boolean,
     filePath: string,
@@ -41,6 +42,7 @@ interface StateMold {
 
 export const useStateStore = defineStore('state', {
     state: (): StateMold => ({
+        debugConsole: true,// 调试窗口模块
         pcDebug: true,// pc端调试
         offline: true,// 是否是离线查看模式
         filePath: "",// 离线查看模式下文件地址

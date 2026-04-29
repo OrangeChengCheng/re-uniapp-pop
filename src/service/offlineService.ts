@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2026-03-20 11:31:20
- * @LastEditTime: 2026-04-15 16:12:42
+ * @LastEditTime: 2026-04-29 18:25:42
  */
 
 // import { useStateStore } from '@/stores/file';
@@ -1372,7 +1372,25 @@ export const element_v3_getVectorParam = createApiHandler(
                 paramList.push(param);
             }
         } else {
-            // TODO 数据库中缺少了场景中矢量的属性表
+            // 获取场景数据库文件
+            const res_sceneDBFile: any = await NativeBridge.value.fileGetChildBySuffix({ filePath: `${fileRootPath}/data`, suffix: ".db" });
+            if (!res_sceneDBFile.data) return { data: null, isSuccess: false, errMsg: "数据库信息获取失败", };
+
+            const { filePath } = res_sceneDBFile.data[0];
+            const dbPath_scene = filePath;
+
+            // 获取属性信息
+            const sql_param = `SELECT * FROM "${dataSetId_noline}_vector_params" WHERE Elem_Id = "${data.elemId}";`;
+            const res_param: any = await NativeBridge.value.dbQuery({ dbPath: dbPath_scene, sql: sql_param });
+            if (!res_param.data) return { data: null, isSuccess: false, errMsg: "数据库信息获取失败", };
+
+            for (const item of res_param.data) {
+                const param: any = {
+                    key: item.Vector_Key,
+                    value: item.Vector_Value,
+                };
+                paramList.push(param);
+            }
         }
         return { data: paramList, isSuccess: true, errMsg: "", };
     }
