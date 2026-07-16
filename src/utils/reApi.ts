@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 14:22:08
- * @LastEditTime: 2026-04-14 18:26:24
+ * @LastEditTime: 2026-07-16 10:28:44
  */
 
 import { useStateStore } from '@/stores/state';
@@ -63,6 +63,7 @@ interface ApiMethods {
     waterVisible(data: any): void;
     extrudeVisible(data: any): void;
     monomerVisible(data: any): void;
+    projectionVisible(data: any): void;
     setUnitActive(data: any): void;
     setGridValidState(data: any): void;
     getDataSetAllElemIDs(data: any): Promise<any>;
@@ -445,6 +446,11 @@ const api: ApiMethods = {
     // MARK re-api 单体化显隐
     monomerVisible: (data: any): void => {
         api.sendMsgWebToApp('monomerVisible', data);
+    },
+
+    // MARK re-api 视频投射显隐
+    projectionVisible: (data: any): void => {
+        api.sendMsgWebToApp('projectionVisible', data);
     },
 
     // MARK re-api 获取某一个数据集的可见的元素id集合

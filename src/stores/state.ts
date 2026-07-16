@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2026-04-29 18:30:30
+ * @LastEditTime: 2026-07-16 10:21:22
  */
 import { defineStore } from 'pinia'
 
@@ -22,6 +22,7 @@ import { defineStore } from 'pinia'
     23 水面
     24 挤出
     25 单体化
+    29 视频投射
 */
 
 interface StateMold {

@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2026-04-14 16:29:31
+ * @LastEditTime: 2026-07-16 10:28:37
  */
 import config from './config'
 import reApi from './reApi'
@@ -76,6 +76,7 @@ export default {
             waterVisible: reApi.waterVisible,
             extrudeVisible: reApi.extrudeVisible,
             monomerVisible: reApi.monomerVisible,
+            projectionVisible: reApi.projectionVisible,
             setUnitActive: reApi.setUnitActive,
             setGridValidState: reApi.setGridValidState,
             getDataSetAllElemIDs: reApi.getDataSetAllElemIDs,

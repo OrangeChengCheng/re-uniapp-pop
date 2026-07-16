@@ -61,11 +61,13 @@ const props = defineProps({
     camToWater: Function,
     camToExtrude: Function,
     camToMonomer: Function,
+    camToProjection: Function,
     camToElem: Function,
     camToDataSet: Function,
     waterVisible: Function,
     extrudeVisible: Function,
     monomerVisible: Function,
+    projectionVisible: Function,
     dataSetVisible: Function,
     elemVisible: Function,
     updateTreeData: Function,
@@ -472,6 +474,15 @@ const handle_formatSceneTree = (list: any) => {
                 item.subNodes = [{ nodeId: `tempNode-${item.nodeId}`, nodeName: '', viewStatus: item.viewStatus }];
             }
         }
+
+        // 视频投射类型
+        if (item.dataSetType === 29 && item.projectionConfig) {
+            item.customNodeType = 'projection';
+            item.projectionId = item.dataSetId;
+            item.projectionName = item.nodeName;
+            item.projectionConfig.projectionId = item.dataSetId;
+            item.projectionConfig.projectionName = item.nodeName;
+        }
     });
 
     // 隐藏没有数据的根节点
@@ -692,6 +703,12 @@ const handle_isExtrudeNode = (nodeData: any) => {
 const handle_isMonomerNode = (nodeData: any) => {
     let dataSetType = nodeData.dataSetType;
     return dataSetType === 25;
+};
+
+// MARK data 判断-视频投射数据
+const handle_isProjectionNode = (nodeData: any) => {
+    let dataSetType = nodeData.dataSetType;
+    return dataSetType === 29;
 };
 
 // MARK data 查找-所有节点指定keys
@@ -1190,6 +1207,23 @@ const eltree_nodeClick = async (nodeData: any, node: any) => {
         return;
     }
 
+    if (handle_isProjectionNode(nodeData)) {
+        if (nodeData.nodeType !== 2) return;
+        const projectionInfo = nodeData.projectionConfig;
+        const convertArrayToNumber = (arr: any) => {
+            if (!Array.isArray(arr)) return arr;
+            return arr.map((el) => Number(el));
+        };
+        const camLoc = {
+            camPos: convertArrayToNumber(projectionInfo.camPos),
+            camDir: convertArrayToNumber(projectionInfo.planeNormal),
+            locDelay: 0.5,
+            locTime: 1,
+        };
+        engine_camToProjection(camLoc);
+        return;
+    }
+
     if (!nodeData.customNodeType) {
         let allDataSets = handle_findAllNodeByLevel([nodeData], 2);
         if (handle_isEntityNode(nodeData)) {
@@ -1279,6 +1313,20 @@ const eltree_check = async (nodeData: any) => {
         const monomerIds = monomerList.map((item: any) => item.monomerId);
 
         engine_monomerVisible(monomerIds, node.checked);
+
+        if (isRvtGroupMode.value) {
+            eltree_check_childNodesCheckStatus(nodeData, node.checked);
+            eltree_check_parentNodesCheckStatus(node.parent);
+        }
+        return;
+    }
+
+    if (handle_isProjectionNode(nodeData)) {
+        let leafNodes = handle_findAllNodeByLevel([nodeData], 2);
+        const projectionList = leafNodes.map((item: any) => item.projectionConfig);
+        const projectionIds = projectionList.map((item: any) => item.projectionId);
+
+        engine_projectionVisible(projectionIds, node.checked);
 
         if (isRvtGroupMode.value) {
             eltree_check_childNodesCheckStatus(nodeData, node.checked);
@@ -1447,7 +1495,7 @@ const eltree_initStyle = () => {
 
 // MARK Engine 模型加载完成回调
 const engine_callback_loadDataSetFinish = () => {
-    console.log('666');
+    console.log('模型加载完成回调');
     engine_initStyle();
 };
 
@@ -1489,6 +1537,11 @@ const engine_camToExtrude = (extrudeIdList: any) => {
 // MARK Engine 定位单体化
 const engine_camToMonomer = (monomerIdList: any) => {
     props.camToMonomer?.(monomerIdList);
+};
+
+// MARK Engine 定位视频投射
+const engine_camToProjection = (camLoc: any) => {
+    props.camToProjection?.(camLoc);
 };
 
 // MARK Engine 定位单构件
@@ -1576,6 +1629,11 @@ const engine_extrudeVisible = (extrudeIdList: any, visible: boolean) => {
 // MARK Engine 单体化显示隐藏
 const engine_monomerVisible = (monomerIdList: any, visible: boolean) => {
     props.monomerVisible?.(monomerIdList, visible);
+};
+
+// MARK Engine 视频投射显示隐藏
+const engine_projectionVisible = (projectionIdList: any, visible: boolean) => {
+    props.projectionVisible?.(projectionIdList, visible);
 };
 // MARK 暴露方法给父组件
 defineExpose({

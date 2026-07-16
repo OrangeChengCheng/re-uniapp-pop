@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2026-03-30 11:39:06
+ * @LastEditTime: 2026-07-16 11:19:09
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -13,11 +13,13 @@
                 :camToWater="re_camToWater"
                 :camToExtrude="re_camToExtrude"
                 :camToMonomer="re_camToMonomer"
+                :camToProjection="re_camToProjection"
                 :camToElem="re_camToElem"
                 :camToDataSet="re_camToDataSet"
                 :waterVisible="re_waterVisible"
                 :extrudeVisible="re_extrudeVisible"
                 :monomerVisible="re_monomerVisible"
+                :projectionVisible="re_projectionVisible"
                 :dataSetVisible="re_dataSetVisible"
                 :elemVisible="re_elemVisible"
                 :updateTreeData="re_updateTreeData"></scene-tree>
@@ -94,6 +96,11 @@ const re_camToMonomer = async (e: any) => {
     NativeBridge.setCamLocToMonomer({ monomerIds: e });
 };
 
+// MARK Engine 定位视频投射
+const re_camToProjection = async (e: any) => {
+    NativeBridge.setCamLocateTo(e);
+};
+
 // MARK Engine 定位数据集
 const re_camToDataSet = async (dataSetList: any, locType: string) => {
     NativeBridge.delAllSelElems();
@@ -138,6 +145,11 @@ const re_extrudeVisible = (extrudeIds: any, visible: boolean) => {
 // MARK Engine 单体化显隐
 const re_monomerVisible = (monomerIds: any, visible: boolean) => {
     NativeBridge.monomerVisible({ monomerIds: monomerIds, visible: visible });
+};
+
+// MARK Engine 视频投射显隐
+const re_projectionVisible = (projectionIds: any, visible: boolean) => {
+    NativeBridge.projectionVisible({ projectionIds: projectionIds, visible: visible });
 };
 
 // MARK Engine 数据集显隐

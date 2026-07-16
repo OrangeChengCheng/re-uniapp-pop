@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2025-07-02 11:25:16
- * @LastEditTime: 2026-04-29 18:31:42
+ * @LastEditTime: 2026-07-16 11:49:03
  */
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -17,8 +17,8 @@ import tool from "@/utils"
 
 
 (window as any).pcDebug = false;
-(window as any).isOffline = true;
-(window as any).debugConsole = true;
+(window as any).isOffline = false;
+(window as any).debugConsole = false;
 
 const app = createApp(App);
 const pinia = Pinia.createPinia();
