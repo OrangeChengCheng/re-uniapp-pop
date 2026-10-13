@@ -1,7 +1,7 @@
 /*
  * @Author: Lemon C
  * @Date: 2025-07-18 09:52:06
- * @LastEditTime: 2025-07-18 10:17:07
+ * @LastEditTime: 2026-10-10 12:17:21
  */
 // loading.ts
 import { ElLoading, LoadingOptions } from 'element-plus';
@@ -19,7 +19,7 @@ export function showLoading(options?: Partial<LoadingOptions>): void {
     const defaultOptions: LoadingOptions = {
         lock: true,
         background: 'rgba(0, 0, 0, 0.5)',
-        text: '',
+        text: '加载中...',
     };
 
     hideLoading();

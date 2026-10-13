@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:44:27
- * @LastEditTime: 2026-04-29 18:30:25
+ * @LastEditTime: 2026-10-10 15:00:40
 -->
 <template>
     <transition name="slide-up-down" :class="{ 'disable-transition': disableTransition }" @after-leave="tran_after_leave">
@@ -40,7 +40,7 @@ onMounted(() => {
     if (window.pcDebug) {
         openView();
     }
-    if (window.isOffline) {
+    if (window.debugConsole) {
         new VConsole();
     }
 });

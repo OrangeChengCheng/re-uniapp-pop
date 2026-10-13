@@ -50,11 +50,14 @@
 // MOD-- JavaScript
 <script setup lang="ts">
 import { ElTree } from 'element-plus';
-import { ref, onMounted, nextTick, computed, watch } from 'vue';
+import { ref, onMounted, nextTick, computed, watch, getCurrentInstance } from 'vue';
 import { useStateStore } from '@/stores/state';
 
 const state_store = useStateStore();
 const REService = (window as any).$service;
+const DataTool = (window as any).$dataTool;
+const EntityTool = (window as any).$entityTool;
+const instance = getCurrentInstance() as any;
 
 const props = defineProps({
     sceneId: String,
@@ -153,6 +156,7 @@ onMounted(() => {
 
 // MARK service 获取场景信息
 const service_getSharedSceneInfo = () => {
+    instance?.proxy.$showLoading();
     REService.getSharedSceneById(props.sceneId).then((res: any) => {
         sceneInfo.value = res;
         if (ref != null) {
@@ -166,7 +170,8 @@ const service_getProjectSceneTree = () => {
     let sceneId = props.sceneId;
     let params = { sceneId, isPublished: true };
     REService.getSharedProjectSceneTree(params).then((res: any) => {
-        treeList.value = handle_formatSceneTree(res);
+        instance?.proxy.$hideLoading();
+        treeList.value = DataTool.handle_formatSceneTree(res, sceneInfo.value);
         eltree_initStyle();
     });
 };
@@ -402,124 +407,166 @@ const service_getElemIds_group = async (nodeData: any, node: any) => {
     return response.childNodeIds;
 };
 
-// MARK data 格式化-场景树
-const handle_formatSceneTree = (list: any) => {
-    if (!list) return [];
-    let sceneData = list;
-    let rootFolders = handle_findAllNodeByLevel(sceneData, 3);
-    let folders = handle_findAllNodeByLevel(sceneData, 1);
-    let allFolders = [...rootFolders, ...folders];
-    allFolders.forEach((item) => {
-        let rootNodeId = item.levelCode.split('/')[0];
-        let find = rootFolders.find((el: any) => el.sceneNodeId === rootNodeId);
-        item.dataSetType = find.dataSetType;
-        item.srcDataSetType = find.srcDataSetType;
-        item['nodeName'] = item.sceneNodeName;
-        item['nodeId'] = item.sceneNodeId;
-    });
+// // MARK data 格式化-场景树
+// const handle_formatSceneTree = (list: any) => {
+//     if (!list) return [];
+//     let sceneData = list;
+//     let rootFolders = handle_findAllNodeByLevel(sceneData, 3);
 
-    let allDatasets = handle_findAllNodeByLevel(sceneData, 2);
-    let { componentPosition } = sceneInfo.value;
-    allDatasets.forEach((item: any) => {
-        item['customNodeType'] = 'dataSet';
-        item['nodeId'] = item.sceneNodeId;
-        item['nodeName'] = item.sceneNodeName;
+//     rootFolders.forEach((item: any) => {
+//         if (item.dataSetType === 0) {
+//             item['sceneNodeName'] = 'BIM';
+//             item['nodeName'] = 'BIM';
+//             item['levelPathName'] = 'BIM';
+//         }
+//         if (item.dataSetType === 10) {
+//             item['sceneNodeName'] = 'WMTS';
+//             item['nodeName'] = 'WMTS';
+//             item['levelPathName'] = 'WMTS';
+//         }
+//     });
 
-        if (item.viewStatus === 2) {
-            item['disabled'] = true;
-        }
+//     let allDatasets = handle_findAllNodeByLevel(sceneData, 2);
+//     let { componentPosition } = sceneInfo.value;
+//     allDatasets.forEach((item: any) => {
+//         if (item.dataSetType === 0) {
+//             item['levelPathName'] = item.levelPathName.replace('模型/', 'BIM/');
+//             item['levelPathName'] = item.levelPathName.replace('模型/', 'BIM/');
+//         }
+//         if (item.dataSetType === 10) {
+//             item['levelPathName'] = item.levelPathName.replace('wmts/', 'WMTS/');
+//         }
 
-        if (item.dataSetType === 0 && item.viewStatus !== 2) {
-            item.subNodes.push({ nodeName: '' });
-        }
+//         if (item.dataSetType === 0 && item.formatType === 1) {
+//             const findLastIndex = item.sceneNodeName.lastIndexOf('.');
+//             if (findLastIndex !== -1) {
+//                 item['nodeName'] = item.sceneNodeName.substring(0, findLastIndex);
+//                 item['sceneNodeName'] = item.nodeName;
+//             } else {
+//                 item['nodeName'] = item.sceneNodeName;
+//             }
+//         } else {
+//             item['nodeName'] = item.sceneNodeName;
+//         }
 
-        if (item.dataSetType === 19) {
-            let componentInfo = item.componentInfo;
-            componentInfo.id = componentInfo.treeNodeId;
-            let find = componentPosition.find((el: any) => el.id === componentInfo.id);
-            if (find) {
-                componentInfo.location = {
-                    rotate: find.rotate,
-                    scale: find.scale,
-                    translation: find.translation,
-                };
-            }
-            let { hostFileId, instanceIndex, isPublished } = componentInfo;
-            if (isPublished) {
-                componentInfo.dataSetId = sceneInfo.value.componentTreeId;
-                componentInfo.elemId = Number(`${hostFileId}${instanceIndex}`);
-            }
-        }
+//         item['customNodeType'] = 'dataSet';
+//         item['nodeId'] = item.sceneNodeId;
 
-        // 水面类型，将waterId提升一级，方便调用
-        if (item.dataSetType === 23) {
-            let waterInfo = item.waterInfo;
-            item.waterId = waterInfo.id;
-        }
+//         if (item.viewStatus === 2) {
+//             item['disabled'] = true;
+//         }
 
-        // 开挖类型，将extrudeId提升一级，方便调用
-        if (item.dataSetType === 24) {
-            let extrudeInfo = item.excavateInfo;
-            item.extrudeId = extrudeInfo.id;
-        }
+//         if (item.dataSetType === 0 && item.viewStatus !== 2) {
+//             item.subNodes.push({
+//                 nodeName: '',
+//                 nodeId: `emptyNode-${item.nodeId}`,
+//             });
+//         }
 
-        if (item.dataSetType === 25) {
-            item.customNodeType = 'monomer';
-            item.monomerId = item.nodeId;
-            item.monomerName = item.nodeName;
-            item.monomerizationInfo = handle_formatMonomerInfo(item.monomerizationInfo);
-            const monomerInfo = item.monomerizationInfo;
-            if (monomerInfo.monomerizationType === 2) {
-                // 构建伪节点，用于展开单体化子节点
-                item.subNodes = [{ nodeId: `tempNode-${item.nodeId}`, nodeName: '', viewStatus: item.viewStatus }];
-            }
-        }
+//         if (item.dataSetType === 19) {
+//             let componentInfo = item.componentInfo;
+//             componentInfo.id = componentInfo.treeNodeId;
+//             let find = componentPosition.find((el: any) => el.id === componentInfo.id);
+//             if (find) {
+//                 componentInfo.location = {
+//                     rotate: find.rotate,
+//                     scale: find.scale,
+//                     translation: find.translation,
+//                 };
+//             }
+//             let { hostFileId, instanceIndex, isPublished } = componentInfo;
+//             if (isPublished) {
+//                 componentInfo.dataSetId = sceneInfo.value.componentTreeId;
+//                 componentInfo.elemId = Number(`${hostFileId}${instanceIndex}`);
+//                 item.elemId = componentInfo.elemId;
+//             }
+//         }
 
-        // 视频投射类型
-        if (item.dataSetType === 29 && item.projectionConfig) {
-            item.customNodeType = 'projection';
-            item.projectionId = item.dataSetId;
-            item.projectionName = item.nodeName;
-            item.projectionConfig.projectionId = item.dataSetId;
-            item.projectionConfig.projectionName = item.nodeName;
-        }
-    });
+//         // 水面类型，将waterId提升一级，方便调用
+//         if (item.dataSetType === 23) {
+//             let waterInfo = item.waterInfo;
+//             item.waterId = waterInfo.id;
+//         }
 
-    // 隐藏没有数据的根节点
-    sceneData = sceneData.filter((el: any) => el.subNodes.length);
-    return sceneData;
-};
+//         // 开挖类型，将extrudeId提升一级，方便调用
+//         if (item.dataSetType === 24) {
+//             let extrudeInfo = item.excavateInfo;
+//             item.extrudeId = extrudeInfo.id;
+//         }
 
-// MARK data 格式化-单体化信息对象
-const handle_formatMonomerInfo = (monomerInfo: any) => {
-    const units = monomerInfo.levelJson;
-    const firstRoom = units[0].floors[0].rooms[0];
-    const firstRoomGeoJson = JSON.parse(firstRoom.geoJson);
-    if (firstRoomGeoJson.rgnList) return monomerInfo;
+//         if (item.dataSetType === 25) {
+//             item.customNodeType = 'monomer';
+//             item.monomerId = item.nodeId;
+//             item.monomerRegNodeId = item.nodeId;
+//             item.monomerName = item.nodeName;
+//             item.monomerizationInfo = DataTool.handle_formatMonomerInfo(item.monomerizationInfo);
+//             const monomerInfo = item.monomerizationInfo;
+//             if (monomerInfo.monomerizationType === 2) {
+//                 // 构建伪节点，用于展开单体化子节点
+//                 item.subNodes = [{ nodeId: `tempNode-${item.nodeId}`, nodeName: '', viewStatus: item.viewStatus }];
+//             }
+//         }
 
-    const dataSetId = monomerInfo.dataSetId;
-    const rooms = units.flatMap((unit: any) => unit.floors.flatMap((floor: any) => floor.rooms));
-    rooms.forEach((room: any) => {
-        const roomGeoJson = JSON.parse(room.geoJson);
-        const fenceClr = roomGeoJson.fenceClr;
-        const { red, green, blue, alpha } = fenceClr;
-        const monomerClr = { red, green, blue, alpha: 128 };
-        const heightMin = roomGeoJson.potList[0][2];
-        const heightMax = roomGeoJson.potList[0][2] + roomGeoJson.potList[0][3];
-        const pointList = roomGeoJson.potList.map((el: any) => el.slice(0, 3));
+//         // 视频投射类型
+//         if (item.dataSetType === 29 && item.projectionConfig) {
+//             item.customNodeType = 'projection';
+//             item.projectionId = item.dataSetId;
+//             item.projectionName = item.nodeName;
+//             item.projectionConfig.projectionId = item.dataSetId;
+//             item.projectionConfig.projectionName = item.nodeName;
+//         }
+//     });
 
-        const groJson = {
-            dataSetId,
-            rgnList: [pointList],
-            heightMin,
-            heightMax,
-            monomerClr,
-        };
-        room.geoJson = JSON.stringify(groJson);
-    });
+//     let folders = handle_findAllNodeByLevel(sceneData, 1);
+//     let allFolders = [...rootFolders, ...folders];
+//     allFolders.forEach((item) => {
+//         let rootNodeId = item.levelCode.split('/')[0];
+//         let find = rootFolders.find((el: any) => el.sceneNodeId === rootNodeId);
+//         item.dataSetType = find.dataSetType;
+//         item.srcDataSetType = find.srcDataSetType;
+//         item['nodeName'] = item.sceneNodeName;
+//         item['nodeId'] = item.sceneNodeId;
+//         if (item.componentSetInfo) {
+//             item.subEntities = item.subNodes;
+//             item.subNodes = [];
+//         }
+//     });
 
-    return monomerInfo;
-};
+//     // 隐藏没有数据的根节点
+//     sceneData = sceneData.filter((el: any) => el.subNodes.length);
+//     return sceneData;
+// };
+
+// // MARK data 格式化-单体化信息对象
+// const handle_formatMonomerInfo = (monomerInfo: any) => {
+//     const units = monomerInfo.levelJson;
+//     const firstRoom = units[0].floors[0].rooms[0];
+//     const firstRoomGeoJson = JSON.parse(firstRoom.geoJson);
+//     if (firstRoomGeoJson.rgnList) return monomerInfo;
+
+//     const dataSetId = monomerInfo.dataSetId;
+//     const rooms = units.flatMap((unit: any) => unit.floors.flatMap((floor: any) => floor.rooms));
+//     rooms.forEach((room: any) => {
+//         const roomGeoJson = JSON.parse(room.geoJson);
+//         const fenceClr = roomGeoJson.fenceClr;
+//         const { red, green, blue, alpha } = fenceClr;
+//         const monomerClr = { red, green, blue, alpha: 128 };
+//         const heightMin = roomGeoJson.potList[0][2];
+//         const heightMax = roomGeoJson.potList[0][2] + roomGeoJson.potList[0][3];
+//         const pointList = roomGeoJson.potList.map((el: any) => el.slice(0, 3));
+
+//         const groJson = {
+//             dataSetId,
+//             rgnList: [pointList],
+//             heightMin,
+//             heightMax,
+//             monomerClr,
+//         };
+//         room.geoJson = JSON.stringify(groJson);
+//     });
+
+//     return monomerInfo;
+// };
 
 // MARK data 格式化-单体化树结构
 const handle_formatMonomerData = (monomerTreeNode: any) => {
@@ -682,9 +729,10 @@ const handle_getRequestParam_group = (nodeData: any, node: any) => {
 
 // MARK data 判断-单构件数据
 const handle_isEntityNode = (nodeData: any) => {
-    let allData = handle_findAllNodeByLevel([nodeData], 2);
-    let isEntityNode = allData.every((el: any) => el.dataSetType === 19);
-    return isEntityNode;
+    // let allData = handle_findAllNodeByLevel([nodeData], 2);
+    // let isEntityNode = allData.every((el: any) => el.dataSetType === 19);
+    // return isEntityNode;
+    return nodeData.dataSetType === 19;
 };
 
 // MARK data 判断-水面数据
@@ -1225,18 +1273,22 @@ const eltree_nodeClick = async (nodeData: any, node: any) => {
     }
 
     if (!nodeData.customNodeType) {
-        let allDataSets = handle_findAllNodeByLevel([nodeData], 2);
         if (handle_isEntityNode(nodeData)) {
-            engine_camToEntity(allDataSets);
+            const entityNodes = EntityTool.getEntityNodes([nodeData]);
+            const entityElems = EntityTool.getEntityElems(entityNodes, false);
+            engine_camToElem(entityElems);
         } else {
+            let allDataSets = handle_findAllNodeByLevel([nodeData], 2);
             engine_camToDataSet(allDataSets);
         }
         return;
     }
 
     if (nodeData.customNodeType === 'dataSet') {
-        if (nodeData.dataSetType === 19) {
-            engine_camToEntity([nodeData]);
+        if (handle_isEntityNode(nodeData)) {
+            const entityNodes = EntityTool.getEntityNodes([nodeData]);
+            const entityElems = EntityTool.getEntityElems(entityNodes, false);
+            engine_camToElem(entityElems);
         } else {
             engine_camToDataSet([nodeData]);
         }
@@ -1331,6 +1383,19 @@ const eltree_check = async (nodeData: any) => {
         if (isRvtGroupMode.value) {
             eltree_check_childNodesCheckStatus(nodeData, node.checked);
             eltree_check_parentNodesCheckStatus(node.parent);
+        }
+        return;
+    }
+
+    if (handle_isEntityNode(nodeData)) {
+        const entityNodes = EntityTool.getEntityNodes([nodeData]);
+        const entityElems = EntityTool.getEntityElems(entityNodes, false);
+        entityElems.forEach((item: any) => {
+            props.elemVisible?.(item.dataSetId, item.elemIdList, node.checked);
+        });
+
+        if (isRvtGroupMode.value) {
+            // 待处理
         }
         return;
     }
@@ -1463,10 +1528,13 @@ const eltree_initStyle = () => {
     let allDatasets = handle_findAllNodeByLevel(treeList.value, 2);
 
     nextTick(() => {
-        let domRef: any = ref_eltree.value;
+        const domRef: any = ref_eltree.value; // 必须放在nextTick渲染后
+        // el-tree 内部的 store，直接拿节点 map，避免重复递归
+        const nodeMap = domRef.store.nodesMap; // key: nodeId, value: Node
 
         allRootNodes.forEach((item: any) => {
-            let node = domRef.getNode(item.nodeId);
+            let node = nodeMap[item.nodeId];
+            if (!node) return;
             const haveNotChecked = handle_findAllKeyValues(item, 'nodeId', 'subNodes', 0);
             const allIds = handle_findAllKeyValues(item, 'nodeId', 'subNodes', false);
             node.expanded = true;
@@ -1477,12 +1545,14 @@ const eltree_initStyle = () => {
         });
 
         allFolders.forEach((item: any) => {
-            let node = domRef.getNode(item.nodeId);
+            const node = nodeMap[item.nodeId];
+            if (!node) return;
             node.checked = item?.viewStatus === 0;
         });
 
         allDatasets.forEach((item: any) => {
-            let node = domRef.getNode(item.nodeId);
+            const node = nodeMap[item.nodeId];
+            if (!node) return;
             node.checked = item?.viewStatus === 0;
         });
         /**
@@ -1544,29 +1614,31 @@ const engine_camToProjection = (camLoc: any) => {
     props.camToProjection?.(camLoc);
 };
 
-// MARK Engine 定位单构件
-const engine_camToEntity = (allDataSets: any) => {
-    let dataSets: any = [];
-    allDataSets.forEach((item: any) => {
-        let componentInfo = item.componentInfo;
-        let find = dataSets.find((el: any) => el.dataSetId === componentInfo.dataSetId);
-        if (find) {
-            find.elemIds.push(componentInfo.elemId);
-        } else {
-            let obj = {
-                dataSetId: componentInfo.dataSetId,
-                elemIds: [componentInfo.elemId],
-            };
-            dataSets.push(obj);
-        }
-    });
+// // MARK Engine 定位单构件
+// const engine_camToEntity = (entityElems: any) => {
+//     props.camToElem?.(locIDList, 'CAM_DIR_TOPRIGHTBACK', true);
 
-    dataSets.forEach((item: any) => {
-        item.dataSetId = item.dataSetId;
-        // item.dataSetId = item.dataSetId.replace(/-/g, '');
-    });
-    engine_camToElem(dataSets);
-};
+//     let dataSets: any = [];
+//     allDataSets.forEach((item: any) => {
+//         let componentInfo = item.componentInfo;
+//         let find = dataSets.find((el: any) => el.dataSetId === componentInfo.dataSetId);
+//         if (find) {
+//             find.elemIds.push(componentInfo.elemId);
+//         } else {
+//             let obj = {
+//                 dataSetId: componentInfo.dataSetId,
+//                 elemIds: [componentInfo.elemId],
+//             };
+//             dataSets.push(obj);
+//         }
+//     });
+
+//     dataSets.forEach((item: any) => {
+//         item.dataSetId = item.dataSetId;
+//         // item.dataSetId = item.dataSetId.replace(/-/g, '');
+//     });
+//     engine_camToElem(dataSets);
+// };
 
 // MARK Engine 定位数据集
 const engine_camToDataSet = (allDataSets: any) => {
@@ -1604,12 +1676,12 @@ const engine_camToDataSet = (allDataSets: any) => {
 };
 
 // MARK Engine 定位构件
-const engine_camToElem = (dataSetList: any) => {
+const engine_camToElem = (dataSetElemList: any) => {
     let locIDList: any = [];
-    dataSetList.forEach((item: any) => {
+    dataSetElemList.forEach((item: any) => {
         let obj = {
             dataSetId: item.dataSetId,
-            elemIdList: item.elemIds,
+            elemIdList: item.elemIds ? item.elemIds : item.elemIdList,
         };
         locIDList.push(obj);
     });

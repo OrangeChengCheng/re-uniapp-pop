@@ -1,7 +1,7 @@
 <!--
  * @Author: Lemon C
  * @Date: 2025-07-03 11:42:15
- * @LastEditTime: 2026-07-16 11:19:09
+ * @LastEditTime: 2026-10-13 10:22:39
 -->
 <template>
     <base-view :base_appTpWebMsg_callback="handle_appToWebMsg">
@@ -48,6 +48,7 @@ import SceneTree from '@/components/Tree/SceneTree.vue';
 import ModelTree from '@/components/Tree/ModelTree.vue';
 import { useStateStore } from '@/stores/state';
 
+
 const state_store = useStateStore();
 const NativeBridge = (window as any).$reapi;
 const ref_scene_tree = ref<InstanceType<typeof SceneTree> | null>(null);
@@ -56,6 +57,7 @@ onMounted(() => {
     // setTimeout(() => {
     //     handle_appToWebMsg({ type: 'Listen.loadDataSetFinish' });
     // }, 10000);
+    
 });
 
 // MARK App->Web 接收App消息
@@ -124,7 +126,7 @@ const re_camToElem = (locIDList: any, locType: string, isHighLight: boolean) => 
         locIDList.forEach((item: any) => {
             NativeBridge.addToSelElems({ dataSetId: item.dataSetId, elemIdList: item.elemIdList });
         });
-        NativeBridge.setSelElemsAttr({ elemClr: [254, 64, 7, 180], probeMask: 1, attrValid: true });
+        // NativeBridge.setSelElemsAttr({ elemClr: [254, 64, 7, 180], probeMask: 1, attrValid: true });
     }
 };
 

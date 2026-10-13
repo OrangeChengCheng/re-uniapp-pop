@@ -1,11 +1,13 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-09-14 10:05:14
- * @LastEditTime: 2026-07-16 10:28:37
+ * @LastEditTime: 2026-10-12 17:02:24
  */
 import config from './config'
 import reApi from './reApi'
 import tool from './tool'
+import dataTool from './dataTool'
+import entityTool from './entityTool'
 import serviceApi from './serviceApi'
 import { showLoading, hideLoading } from './loading'
 
@@ -88,6 +90,15 @@ export default {
         (window as any).$tool = {
             toPromise: tool.toPromise,
             data_deepClone: tool.data_deepClone,
+        };
+        (window as any).$dataTool = {
+            handle_formatSceneTree: dataTool.handle_formatSceneTree,
+            handle_findAllNodeByLevel: dataTool.handle_findAllNodeByLevel,
+            handle_formatMonomerInfo: dataTool.handle_formatMonomerInfo,
+        };
+        (window as any).$entityTool = {
+            getEntityNodes: entityTool.getEntityNodes,
+            getEntityElems: entityTool.getEntityElems,
         };
 
         app.config.globalProperties.$showLoading = showLoading;

@@ -1,15 +1,15 @@
 /*
  * @Author: Lemon C
  * @Date: 2024-11-09 10:46:29
- * @LastEditTime: 2026-07-16 10:21:22
+ * @LastEditTime: 2026-10-10 11:57:05
  */
 import { defineStore } from 'pinia'
 
 /**
     0 BIM模型
-    13 遥感影像
     10 WMTS地图服务
     11 倾斜摄影
+    13 遥感影像
     14 360全景图
     15 点云
     16 二维图纸
@@ -23,6 +23,7 @@ import { defineStore } from 'pinia'
     24 挤出
     25 单体化
     29 视频投射
+    31 高斯泼溅
 */
 
 interface StateMold {
